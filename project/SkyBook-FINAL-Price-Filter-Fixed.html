@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyBook — Flights, Fares &amp; Fast Bookings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   TOKENS
+============================================================ */
+:root{
+    --navy:#0b1d3a;
+    --navy-2:#12294f;
+    --navy-3:#1a3665;
+    --coral:#ff5a36;
+    --coral-dark:#e04322;
+    --gold:#f2a93b;
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --text:#1b2430;
+    --muted:#6b7686;
+    --border:#e4e8f0;
+    --success:#1e8e5a;
+    --success-bg:#e8f7ef;
+    --warn:#b45309;
+    --warn-bg:#fff1df;
+    --danger:#d64545;
+    --radius-lg:16px;
+    --radius-md:12px;
+    --radius-sm:8px;
+    --shadow:0 10px 30px rgba(11,29,58,.08);
+    --shadow-lift:0 16px 40px rgba(11,29,58,.16);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+    margin:0;
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;color:var(--navy);margin:0;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input,select{font-family:inherit;font-size:15px;}
+:focus-visible{outline:3px solid #8fb8ff;outline-offset:2px;}
+.hidden{display:none !important;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ============================================================
+   HEADER
+============================================================ */
+header{
+    background:var(--navy);
+    padding:16px 5%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    z-index:200;
+    box-shadow:0 2px 14px rgba(0,0,0,.18);
+}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:21px;color:#fff;}
+.logo .logo-mark{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(135deg,var(--coral),var(--gold));
+    display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+}
+nav{display:flex;align-items:center;gap:26px;}
+nav a{color:#c9d3e6;font-size:14.5px;font-weight:500;transition:color .15s;padding:6px 0;}
+nav a:hover,nav a.nav-active{color:#fff;}
+.nav-cta{display:flex;align-items:center;gap:10px;}
+.btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;border-radius:var(--radius-sm);
+    font-weight:600;font-size:14.5px;transition:transform .12s,box-shadow .12s,background .15s;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--coral);color:#fff;box-shadow:0 6px 18px rgba(255,90,54,.35);}
+.btn-primary:hover{background:var(--coral-dark);}
+.btn-primary:disabled{background:#c7cbd4;box-shadow:none;cursor:not-allowed;}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.25);}
+.btn-ghost:hover{background:rgba(255,255,255,.16);}
+.btn-outline{background:#fff;color:var(--navy);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--navy-3);}
+.btn-block{width:100%;padding:14px;font-size:15.5px;}
+.btn-sm{padding:7px 14px;font-size:13px;}
+
+/* ============================================================
+   HERO + SEARCH
+============================================================ */
+.hero{
+    background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 55%,var(--navy-3) 100%);
+    padding:56px 5% 92px;
+    position:relative;
+    overflow:hidden;
+}
+.hero.compact{padding:22px 5% 64px;}
+.hero-path{position:absolute;inset:0;opacity:.5;pointer-events:none;}
+.hero-copy{max-width:1180px;margin:0 auto 34px;color:#fff;position:relative;}
+.hero-copy .eyebrow{color:var(--gold);font-weight:600;font-size:14px;letter-spacing:.2px;}
+.hero-copy h1{color:#fff;font-size:clamp(28px,3.4vw,42px);line-height:1.15;margin-top:8px;max-width:640px;}
+.hero-copy p{color:#c9d3e6;margin-top:12px;max-width:520px;font-size:15.5px;line-height:1.6;}
+.hero.compact .hero-copy{display:none;}
+
+.search-shell{max-width:1180px;margin:0 auto;position:relative;}
+.trip-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.trip-tab{
+    background:rgba(255,255,255,.1);color:#dfe6f5;border:1px solid rgba(255,255,255,.2);
+    padding:9px 18px;border-radius:999px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px;
+}
+.trip-tab .dot{width:7px;height:7px;border-radius:50%;border:1.5px solid #dfe6f5;}
+.trip-tab.is-active{background:#fff;color:var(--navy);border-color:#fff;}
+.trip-tab.is-active .dot{background:var(--coral);border-color:var(--coral);}
+
+.search-card{
+    background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-lift);
+    padding:22px 22px 24px;
+}
+.search-grid{
+    display:grid;grid-template-columns:1.15fr auto 1.15fr 1fr 1fr 1.1fr;gap:0;
+    border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;
+}
+.search-field{padding:11px 16px;border-right:1px solid var(--border);position:relative;}
+.search-field:last-child{border-right:0;}
+.search-field label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+.search-field input,.search-field select{width:100%;border:none;padding:0;font-size:15.5px;font-weight:700;color:var(--navy);background:transparent;}
+.search-field input:focus,.search-field select:focus{outline:none;}
+.search-field small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px;}
+.swap-wrap{display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.swap-btn{
+    width:34px;height:34px;border-radius:50%;background:#fff;border:1.5px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--navy);
+    transition:transform .2s,border-color .2s;
+}
+.swap-btn:hover{transform:rotate(180deg);border-color:var(--coral);color:var(--coral);}
+.search-submit{display:flex;align-items:stretch;padding:0;}
+.search-submit button{width:100%;background:var(--coral);color:#fff;font-weight:700;font-size:15px;letter-spacing:.3px;transition:background .15s;}
+.search-submit button:hover{background:var(--coral-dark);}
+
+.multicity-panel{display:none;margin-top:14px;border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;}
+.multicity-panel.is-open{display:block;}
+.multicity-panel .leg-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;margin-bottom:10px;align-items:end;}
+.multicity-panel .leg-row .search-field{border:1px solid var(--border);border-radius:var(--radius-sm);}
+.multicity-panel .remove-leg{color:var(--danger);font-size:13px;font-weight:600;padding:10px;}
+.add-leg{color:var(--coral);font-weight:700;font-size:13.5px;padding:8px 0;}
+
+.perk-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.perk-chip{
+    background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:8px 14px;font-size:12.5px;color:var(--muted);
+    display:flex;align-items:center;gap:6px;font-weight:600;
+}
+.perk-chip.is-active{background:#fff1eb;border-color:#ffcdb8;color:var(--coral-dark);}
+
+/* compact strip shown once results are on screen */
+.search-strip{
+    display:none;max-width:1180px;margin:0 auto;background:#fff;border-radius:var(--radius-md);
+    box-shadow:var(--shadow-lift);padding:14px 20px;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+}
+.search-strip.is-visible{display:flex;}
+.strip-info{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px;}
+.strip-badge{background:#edf3ff;color:#2457a6;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;}
+.strip-route{font-weight:700;font-size:17px;color:var(--navy);}
+.strip-sep{color:var(--border);}
+.strip-meta{color:var(--muted);font-size:13.5px;}
+
+/* ============================================================
+   TRUST STRIP
+============================================================ */
+.trust-strip{max-width:1180px;margin:-52px auto 0;position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:0 5%;}
+.trust-item{background:#fff;border-radius:var(--radius-md);box-shadow:var(--shadow);padding:18px 18px;display:flex;gap:12px;align-items:flex-start;}
+.trust-item .ti-icon{width:38px;height:38px;border-radius:10px;background:#fff1eb;color:var(--coral-dark);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.trust-item h4{font-size:14.5px;}
+.trust-item p{font-size:12.5px;color:var(--muted);margin:4px 0 0;line-height:1.5;}
+
+/* ============================================================
+   RESULTS
+============================================================ */
+.results-heading{max-width:1180px;margin:44px auto 0;padding:0 5%;}
+.results-heading h2{font-size:25px;}
+.results-heading p{color:var(--muted);font-size:14px;margin-top:4px;}
+
+.results-layout{max-width:1180px;margin:20px auto 60px;padding:0 5%;display:grid;grid-template-columns:270px 1fr;gap:22px;align-items:start;}
+
+.filters-card{
+    background:#fff;
+    border:1px solid #e6ebf2;
+    border-radius:18px;
+    box-shadow:0 10px 28px rgba(11,29,58,.07);
+    padding:0;
+    position:sticky;
+    top:90px;
+    overflow:hidden;
+}
+
+.filters-head{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:18px 18px 16px;
+    background:linear-gradient(180deg,#fbfcfe 0%,#f7f9fc 100%);
+    border-bottom:1px solid #edf1f5;
+}
+.filters-icon{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    background:#0b1d3a;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    flex-shrink:0;
+}
+.filters-head h3{
+    font-size:15px;
+    margin:0;
+    color:var(--navy);
+}
+.filters-head p{
+    margin:3px 0 0;
+    font-size:11.5px;
+    color:var(--muted);
+}
+
+.filter-block{
+    padding:17px 18px;
+    margin:0;
+    border-top:1px solid #edf1f5;
+}
+.filter-block:first-of-type{border-top:0;}
+.filter-block h4{
+    font-size:10.5px;
+    color:#8290a4;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    margin:0 0 11px;
+    font-weight:800;
+}
+
+.filter-option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    padding:11px 0;
+    cursor:pointer;
+}
+.filter-option + .filter-option{
+    border-top:1px solid #f0f3f7;
+}
+.filter-copy{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    flex:1;
+    min-width:0;
+}
+.filter-option-title{
+    font-size:13px;
+    font-weight:700;
+    color:#23324b;
+}
+.filter-option-sub{
+    font-size:10.5px;
+    color:#8894a6;
+}
+.filter-option input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+.filter-toggle{
+    position:relative;
+    width:36px;
+    height:20px;
+    border-radius:999px;
+    background:#d8dee8;
+    transition:.18s ease;
+    flex:0 0 auto;
+}
+.filter-toggle::after{
+    content:"";
+    position:absolute;
+    top:3px;
+    left:3px;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.18);
+    transition:.18s ease;
+}
+.filter-option input:checked + .filter-toggle{
+    background:var(--coral);
+}
+.filter-option input:checked + .filter-toggle::after{
+    transform:translateX(16px);
+}
+
+.filter-block-title-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:11px;
+}
+.filter-block-title-row h4{margin:0;}
+.price-chip{
+    font-size:10.5px;
+    font-weight:800;
+    color:var(--coral-dark);
+    background:#fff1eb;
+    padding:5px 7px;
+    border-radius:999px;
+}
+
+.filter-price input[type=range]{
+    width:100%;
+    height:4px;
+    accent-color:var(--coral);
+    cursor:pointer;
+}
+.filter-price .fp-values{
+    display:flex;
+    justify-content:space-between;
+    font-size:10px;
+    color:#9aa4b3;
+    margin-top:6px;
+}
+
+.filter-select-wrap{
+    position:relative;
+}
+.filter-select{
+    width:100%;
+    padding:11px 34px 11px 11px;
+    border:1px solid #dce3ec;
+    border-radius:10px;
+    font-size:12.5px;
+    color:#26364f;
+    background:#fbfcfe;
+    outline:none;
+}
+.filter-select:focus{
+    border-color:var(--coral);
+    box-shadow:0 0 0 3px rgba(255,90,54,.1);
+}
+
+.filters-reset-new{
+    width:calc(100% - 36px);
+    margin:0 18px 18px;
+    padding:10px 12px;
+    border:0;
+    border-radius:10px;
+    background:#f4f6f9;
+    color:#5f6d81;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.15s ease;
+}
+.filters-reset-new:hover{
+    background:#e9edf3;
+    color:var(--navy);
+}
+
+.results-count{font-size:13.5px;color:var(--muted);margin-bottom:14px;}
+.flight-list{display:flex;flex-direction:column;gap:14px;}
+.flight-card{
+    background:#fff;border-radius:var(--radius-md);box-shadow:var(--shadow);padding:20px 22px;
+    display:flex;gap:20px;align-items:stretch;cursor:pointer;border:2px solid transparent;
+    transition:border-color .15s,box-shadow .15s;position:relative;
+}
+.flight-card:hover{box-shadow:var(--shadow-lift);}
+.flight-card.is-selected{border-color:var(--coral);}
+.flight-card .fc-main{flex:1;min-width:0;}
+.flight-card .fc-top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.airline-tag{display:flex;align-items:center;gap:9px;}
+.airline-mark{width:28px;height:28px;border-radius:8px;background:var(--navy-3);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.airline-name{font-size:14.5px;font-weight:700;color:var(--text);}
+.status-pill{font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--success-bg);color:var(--success);letter-spacing:.2px;}
+.status-pill.is-delayed{background:var(--warn-bg);color:var(--warn);}
+.status-pill.is-arrived{background:#edf3ff;color:#2457a6;}
+.fc-route{font-size:18px;font-weight:700;color:var(--navy);margin:12px 0 10px;}
+.fc-times{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;}
+.fc-time{font-size:22px;font-weight:800;color:var(--text);}
+.fc-place{font-size:12.5px;color:var(--muted);margin-top:3px;}
+.fc-duration{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;}
+.fc-duration .line{width:100%;height:1px;background:var(--border);position:relative;margin:4px 0;}
+.fc-meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12.5px;margin-top:14px;}
+.fc-side{min-width:150px;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:10px;border-left:1px dashed var(--border);padding-left:20px;}
+.fc-price{font-size:23px;font-weight:800;color:var(--navy);}
+.fc-price-note{font-size:11.5px;color:var(--muted);text-align:right;}
+
+.empty-card{background:#fff;border-radius:var(--radius-md);box-shadow:var(--shadow);padding:40px;text-align:center;color:var(--muted);}
+.empty-card h3{color:var(--text);margin-bottom:8px;}
+
+.sticky-bar{
+    position:sticky;bottom:16px;margin-top:18px;background:var(--navy);color:#fff;border-radius:var(--radius-md);
+    padding:16px 24px;display:none;align-items:center;justify-content:space-between;gap:18px;box-shadow:0 -10px 30px rgba(0,0,0,.25);flex-wrap:wrap;
+}
+.sticky-bar.is-visible{display:flex;}
+.sticky-bar .sb-route{font-weight:700;font-size:15px;}
+.sticky-bar .sb-meta{font-size:12px;color:#a9b7d0;margin-top:2px;}
+.sticky-bar .sb-price{font-size:21px;font-weight:800;color:var(--gold);}
+
+@media(max-width:900px){.results-layout{grid-template-columns:1fr;}.filters-card{position:static;}.trust-strip{grid-template-columns:1fr 1fr;}}
+@media(max-width:650px){.search-grid{grid-template-columns:1fr;}.search-field{border-right:0;border-bottom:1px solid var(--border);}.swap-wrap{display:none;}.trust-strip{grid-template-columns:1fr;margin-top:16px;}.fc-side{border-left:0;border-top:1px dashed var(--border);padding-left:0;padding-top:14px;align-items:stretch;width:100%;}.fc-price-note{text-align:left;}}
+
+/* ============================================================
+   MODAL / BOOKING FLOW
+============================================================ */
+.modal{display:none;position:fixed;inset:0;background:rgba(11,29,58,.55);z-index:500;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;}
+.modal.is-visible{display:flex;}
+.modal-box{background:#fff;border-radius:var(--radius-lg);max-width:980px;width:100%;position:relative;box-shadow:var(--shadow-lift);overflow:hidden;}
+.modal-close{position:absolute;top:16px;right:18px;font-size:22px;color:var(--muted);line-height:1;z-index:5;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:var(--shadow);}
+.modal-close:hover{color:var(--danger);}
+
+.booking-grid{display:grid;grid-template-columns:1.5fr 1fr;max-height:86vh;}
+.booking-main{padding:32px 32px 28px;overflow-y:auto;}
+.booking-side{background:var(--bg);padding:32px 24px;border-left:1px solid var(--border);overflow-y:auto;}
+.booking-main h2{font-size:21px;margin-bottom:4px;}
+.booking-main .step-note{color:var(--muted);font-size:13px;margin-bottom:20px;}
+
+.trip-card{border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px;margin-bottom:22px;}
+.trip-card .tc-route{font-size:18px;font-weight:700;color:var(--navy);}
+.trip-card .tc-meta{font-size:12.5px;color:var(--muted);margin:4px 0 14px;}
+.trip-card .tc-times{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
+.trip-card .tc-time{font-size:19px;font-weight:800;color:var(--text);}
+.trip-card .tc-place{font-size:12px;color:var(--muted);margin-top:3px;}
+.trip-card .tc-mid{flex:1;text-align:center;color:var(--muted);font-size:11.5px;padding-top:4px;}
+.trip-card .tc-baggage{display:flex;gap:18px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);font-size:12px;color:var(--muted);flex-wrap:wrap;}
+
+.form-section{border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px;margin-bottom:16px;}
+.form-section .fs-label{font-size:12.5px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:14px;}
+.form-row{display:grid;gap:14px;margin-bottom:14px;}
+.form-row.cols-2{grid-template-columns:1fr 1fr;}
+.form-row.cols-3{grid-template-columns:.7fr 1.3fr 1fr;}
+.form-row:last-child{margin-bottom:0;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:12.5px;font-weight:600;color:var(--muted);}
+.form-group input,.form-group select{
+    padding:11px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14.5px;color:var(--text);background:#fff;
+}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,90,54,.12);}
+.form-hint{font-size:11.5px;color:var(--muted);margin-top:-2px;}
+.check-row{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text);margin-top:6px;line-height:1.5;}
+.check-row input{margin-top:3px;width:16px;height:16px;accent-color:var(--coral);flex-shrink:0;}
+
+.fare-card{background:#fff;border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow);margin-bottom:18px;}
+.fare-card h3{font-size:15px;margin-bottom:14px;}
+.fare-row{display:flex;justify-content:space-between;font-size:14px;color:var(--text);padding:6px 0;}
+.fare-row.muted{color:var(--muted);}
+.fare-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:800;color:var(--navy);font-size:17px;}
+.addon-card{background:#fff;border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;font-size:13px;}
+.addon-card .ac-title{font-weight:700;color:var(--navy);margin-bottom:4px;font-size:13.5px;}
+.addon-card .ac-desc{color:var(--muted);font-size:12.5px;margin-bottom:10px;}
+.addon-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px dashed var(--border);}
+.addon-row:first-of-type{border-top:0;}
+.addon-row .ar-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);}
+.addon-row .ar-price{font-size:12.5px;font-weight:700;color:var(--success);}
+.trust-mini{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:4px;}
+
+@media(max-width:800px){.booking-grid{grid-template-columns:1fr;max-height:none;}.booking-side{border-left:0;border-top:1px solid var(--border);}.form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr;}}
+
+/* payment + success (single column, capped width) */
+.narrow-section{max-width:460px;margin:0 auto;padding:40px 34px;}
+.narrow-section h2{font-size:21px;margin-bottom:18px;text-align:center;}
+.pay-amount{background:var(--bg);border-radius:var(--radius-md);padding:18px;text-align:center;margin-bottom:20px;}
+.pay-amount .pa-label{font-size:12.5px;color:var(--muted);}
+.pay-amount .pa-value{font-size:28px;font-weight:800;color:var(--navy);margin-top:4px;}
+.pay-methods{display:flex;gap:10px;margin-bottom:18px;}
+.pay-methods label{flex:1;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;font-size:13.5px;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s;}
+.pay-methods input{display:none;}
+.pay-methods input:checked + span{color:var(--coral-dark);}
+.pay-methods label:has(input:checked){border-color:var(--coral);background:#fff5f1;}
+.pay-fields{margin-bottom:16px;}
+.scanner-box{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0;}
+.scanner-box canvas{border-radius:var(--radius-sm);border:1px solid var(--border);}
+
+.success-icon{width:64px;height:64px;border-radius:50%;background:var(--success-bg);color:var(--success);font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.ticket{border:1.5px dashed var(--border);border-radius:var(--radius-md);padding:20px;margin:18px 0;}
+.ticket-row{display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;color:var(--text);}
+.ticket-row span:first-child{color:var(--muted);}
+.ticket-ref{text-align:center;background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;}
+.ticket-ref .tr-code{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:1px;}
+
+/* ============================================================
+   AUTH PAGES
+============================================================ */
+.auth-shell{min-height:calc(100vh - 68px);display:flex;align-items:center;justify-content:center;padding:40px 16px;background:var(--bg);}
+.auth-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:38px 36px;max-width:420px;width:100%;}
+.auth-card h2{font-size:23px;text-align:center;}
+.auth-card p.sub{color:var(--muted);font-size:13.5px;text-align:center;margin-top:6px;margin-bottom:24px;}
+.auth-card .form-group{margin-bottom:16px;}
+.auth-switch{text-align:center;font-size:13.5px;color:var(--muted);margin-top:18px;}
+.auth-switch a{color:var(--coral-dark);font-weight:600;}
+.auth-message{text-align:center;font-size:13.5px;margin-top:14px;font-weight:600;min-height:18px;}
+
+/* ============================================================
+   ADMIN
+============================================================ */
+.admin-wrap{max-width:1100px;margin:36px auto;padding:0 5% 60px;}
+.admin-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:22px;}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px;}
+.stat-card{background:#fff;border-radius:var(--radius-md);box-shadow:var(--shadow);padding:20px;text-align:center;}
+.stat-card .sc-value{font-size:28px;font-weight:800;color:var(--navy);}
+.stat-card .sc-label{font-size:12.5px;color:var(--muted);margin-top:4px;}
+.admin-table-wrap{background:#fff;border-radius:var(--radius-md);box-shadow:var(--shadow);overflow:hidden;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{background:var(--bg);color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.3px;text-align:left;padding:12px 16px;}
+td{padding:13px 16px;border-top:1px solid var(--border);color:var(--text);}
+.seat-good{color:var(--success);font-weight:700;}
+.seat-low{color:var(--danger);font-weight:700;}
+.admin-message{font-size:13px;color:var(--muted);margin-bottom:14px;}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer{background:var(--navy);color:#c9d3e6;padding:36px 5% 26px;margin-top:60px;}
+.footer-grid{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.footer-grid .f-brand{display:flex;align-items:center;gap:8px;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;}
+.footer-links{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;}
+.footer-copy{max-width:1180px;margin:22px auto 0;border-top:1px solid rgba(255,255,255,.12);padding-top:16px;font-size:12px;color:#8695b3;text-align:center;}
+
+/* toast message */
+.status-line{max-width:1180px;margin:14px auto 0;padding:0 5%;text-align:center;font-size:13.5px;font-weight:600;color:var(--navy);min-height:18px;}
+
+
+/* ============================================================
+   BOOKING MODAL SCROLL FIX
+   Keeps the traveller form and bottom action button reachable
+   on laptops and smaller screens.
+============================================================ */
+.modal-overlay,
+.booking-modal-overlay {
+    overflow-y: auto !important;
+    align-items: flex-start !important;
+    padding: 14px 0 !important;
+}
+
+.modal,
+.modal-content,
+.booking-modal,
+.booking-modal-content {
+    max-height: calc(100vh - 28px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+}
+
+/* The booking modal used by SkyBook is a large two-column panel.
+   Allow its internal content to scroll instead of being clipped. */
+#bookingModal {
+    overflow-y: auto !important;
+}
+
+#bookingModal > div,
+#bookingModal .modal,
+#bookingModal .modal-content,
+#bookingModal .booking-modal,
+#bookingModal .booking-modal-content {
+    max-height: calc(100vh - 28px) !important;
+    overflow-y: auto !important;
+}
+
+/* Give the final booking action enough room above the viewport edge. */
+#bookingModal form,
+#bookingModal .traveller-form,
+#bookingModal .booking-form {
+    padding-bottom: 28px !important;
+}
+
+@media (max-height: 800px) {
+    .modal,
+    .modal-content,
+    .booking-modal,
+    .booking-modal-content,
+    #bookingModal > div {
+        max-height: calc(100vh - 16px) !important;
+    }
+}
+
+
+/* ============================================================
+   LIVE AIRCRAFT SEAT MAP
+============================================================ */
+.seat-selection-summary{
+    display:flex;justify-content:space-between;gap:12px;align-items:center;
+    margin:8px 0 10px;padding:10px 12px;border:1px solid var(--border);
+    border-radius:10px;background:#f8fafc;font-size:13px;
+}
+.seat-legend{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;font-size:12px;color:var(--muted);}
+.seat-legend span{display:flex;align-items:center;gap:6px;}
+.seat-demo{display:inline-block;width:20px;height:20px;border-radius:5px;border:1px solid #b8c4d6;}
+.seat-demo-available{background:#fff;}
+.seat-demo-selected{background:#0b1d3a;border-color:#0b1d3a;}
+.seat-demo-booked{background:#d9dee7;border-color:#c6ccd6;}
+.aircraft-shell{
+    max-width:540px;margin:8px auto 0;padding:16px 12px 20px;
+    border:2px solid #d8e0ec;border-radius:48% 48% 22px 22px / 42px 42px 22px 22px;
+    background:#f8fafc;
+}
+.aircraft-nose,.aircraft-tail{text-align:center;font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--muted);}
+.aircraft-nose{margin:4px 0 14px}.aircraft-tail{margin-top:14px}
+.seat-column-labels,.seat-row{
+    display:grid;grid-template-columns:36px 36px 36px 28px 36px 36px 36px;
+    gap:6px;justify-content:center;align-items:center;
+}
+.seat-column-labels{margin-bottom:7px;font-size:11px;font-weight:800;text-align:center;color:var(--muted);}
+.seat-layout{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;padding:3px 5px;}
+.seat-row-number{position:absolute;left:4px;width:25px;text-align:center;font-size:10px;color:var(--muted);}
+.seat-row{position:relative;}
+.seat-btn{
+    width:36px;height:34px;border:1px solid #b8c4d6;border-radius:8px 8px 5px 5px;
+    background:#fff;color:#17243a;font-size:10px;font-weight:800;cursor:pointer;
+}
+.seat-btn:hover:not(:disabled){border-color:#0b1d3a;transform:translateY(-1px);}
+.seat-btn.selected{background:#0b1d3a;color:#fff;border-color:#0b1d3a;box-shadow:0 0 0 2px rgba(11,29,58,.12);}
+.seat-btn.booked{background:#d9dee7;color:#8c96a5;border-color:#c6ccd6;cursor:not-allowed;text-decoration:line-through;}
+.seat-aisle{width:28px;text-align:center;color:#a4afbf;font-size:9px;}
+.seat-loading{text-align:center;padding:24px;color:var(--muted);font-size:13px;}
+.seat-help{text-align:center;color:var(--muted);font-size:11.5px;margin-top:9px;}
+@media(max-width:600px){
+  .seat-column-labels,.seat-row{grid-template-columns:32px 32px 32px 20px 32px 32px 32px;gap:4px}
+  .seat-btn{width:32px;height:31px;font-size:9px}
+}
+
+
+/* RIGHT-SIDE SEAT LAYOUT */
+.right-seat-card{padding:18px !important}
+.right-seat-title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.chosen-seat-pill{background:#eef2f7;border-radius:9px;padding:8px 10px;font-size:12px;white-space:nowrap;color:#536176}
+.chosen-seat-pill strong{color:#10203a}
+.right-seat-card .seat-legend{justify-content:center;margin:12px 0 8px}
+.right-seat-card .aircraft-shell{max-width:350px;margin:0 auto;padding:14px 8px 16px}
+.right-seat-card .seat-layout{max-height:285px;overflow-y:auto}
+.right-seat-card .seat-column-labels,
+.right-seat-card .seat-row{grid-template-columns:33px 33px 33px 22px 33px 33px 33px;gap:5px}
+.right-seat-card .seat-btn{width:33px;height:31px;font-size:9px}
+.seat-live-status{text-align:center;margin-top:8px;color:#66758b;font-size:12px;font-weight:700}
+
+
+/* INTELLIGENT CITY / AIRPORT AUTOCOMPLETE */
+.search-field{position:relative}
+.search-grid{overflow:visible !important;}
+.search-card{overflow:visible !important;}
+.smart-city-list{
+    display:none;position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:10000;
+    background:#fff;border:1px solid #d9e1ec;border-radius:12px;
+    box-shadow:0 14px 34px rgba(15,31,55,.18);max-height:280px;overflow-y:auto;text-align:left;
+}
+.smart-city-option{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:11px 13px;cursor:pointer;border-bottom:1px solid #eef2f6;
+}
+.smart-city-option:last-child{border-bottom:none}
+.smart-city-option:hover,.smart-city-option.smart-active{background:#f5f8fc}
+.smart-city-name{font-size:14px;font-weight:800;color:#14233b}
+.smart-airport-name{font-size:11px;color:#748196;margin-top:2px}
+.smart-airport-code{
+    flex:0 0 auto;background:#edf2f7;border-radius:7px;padding:6px 8px;
+    font-size:12px;font-weight:900;color:#10203a
+}
+.smart-no-city{padding:12px;color:#748196;font-size:13px}
+
+
+.trip-result-label{
+    display:inline-block;margin:0 0 7px;padding:5px 9px;border-radius:999px;
+    background:#eef3f8;color:#0b1d3a;font-size:11px;font-weight:800;
+}
+
+/* ============================================================
+   CUSTOMER PORTAL
+============================================================ */
+.customer-wrap{
+    width:min(1180px,92%);
+    margin:42px auto 70px;
+}
+.customer-hero-card{
+    background:linear-gradient(135deg,var(--navy),var(--navy-3));
+    border-radius:22px;
+    padding:28px 30px;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    box-shadow:var(--shadow);
+}
+.customer-hero-card h2{color:#fff;font-size:28px;margin:4px 0 7px}
+.customer-hero-card p{margin:0;color:#c9d5e8;font-size:13.5px}
+.customer-eyebrow{font-size:10.5px;font-weight:800;letter-spacing:1.5px;color:#ffb39f}
+.customer-actions{display:flex;gap:9px;flex-wrap:wrap}
+.customer-hero-card .btn-outline{border-color:rgba(255,255,255,.38);color:#fff;background:rgba(255,255,255,.06)}
+.customer-hero-card .btn-outline:hover{background:rgba(255,255,255,.13)}
+
+.customer-stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin:18px 0;
+}
+.customer-stat-card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    box-shadow:0 7px 22px rgba(11,29,58,.05);
+}
+.customer-stat-icon{
+    width:42px;height:42px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:#eef3f8;color:var(--navy);font-weight:900;
+}
+.customer-stat-value{font-size:22px;font-weight:800;color:var(--navy);font-family:'Space Grotesk',sans-serif}
+.customer-stat-label{font-size:12px;color:var(--muted);margin-top:2px}
+
+.customer-section{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+.customer-section-head{
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+    padding:20px 22px;border-bottom:1px solid var(--border);
+}
+.customer-section-head h3{font-size:19px}
+.customer-section-head p{margin:4px 0 0;color:var(--muted);font-size:12.5px}
+.customer-table-wrap{overflow-x:auto}
+.customer-table{width:100%;border-collapse:collapse;min-width:930px}
+.customer-table th{
+    background:#f8fafc;color:#5f6d81;font-size:10.5px;letter-spacing:.4px;
+    text-transform:uppercase;text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)
+}
+.customer-table td{
+    padding:14px;border-bottom:1px solid #edf0f5;font-size:12.5px;vertical-align:middle
+}
+.customer-table tr:last-child td{border-bottom:none}
+.customer-booking-ref{font-weight:800;color:var(--navy)}
+.customer-route{font-weight:700;color:#25334b}
+.customer-route-code{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.customer-status{
+    display:inline-block;padding:5px 8px;border-radius:999px;font-size:10.5px;font-weight:800;
+    background:var(--success-bg);color:var(--success)
+}
+.customer-empty{text-align:center !important;color:var(--muted);padding:32px !important}
+
+.customer-profile-card{
+    margin-top:18px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:18px;
+}
+.customer-profile-label{font-size:10px;font-weight:800;letter-spacing:1.2px;color:var(--muted)}
+.customer-profile-name{font-size:17px;font-weight:800;color:var(--navy);margin-top:4px}
+.customer-profile-email{font-size:12px;color:var(--muted);margin-top:2px}
+
+@media(max-width:760px){
+    .customer-hero-card{align-items:flex-start;flex-direction:column;padding:22px}
+    .customer-stats{grid-template-columns:1fr}
+    .customer-actions{width:100%}
+    .customer-actions .btn{flex:1}
+    .customer-profile-card{align-items:flex-start;flex-direction:column}
+}
+
+
+/* ============================================================
+   ADMIN ANALYTICS GRAPHS
+============================================================ */
+.admin-analytics{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+    margin:18px 0;
+}
+.admin-chart-card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:19px;
+    box-shadow:0 8px 24px rgba(11,29,58,.055);
+    min-width:0;
+}
+.admin-chart-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:17px;
+}
+.admin-chart-head h3{
+    margin:0;
+    color:var(--navy);
+    font-size:17px;
+}
+.admin-chart-head p{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:11.5px;
+}
+.admin-chart-badge{
+    flex:0 0 auto;
+    max-width:46%;
+    background:#eef3f8;
+    color:var(--navy);
+    border-radius:10px;
+    padding:7px 9px;
+    font-size:10.5px;
+    font-weight:800;
+    text-align:right;
+}
+.admin-bar-chart{
+    display:flex;
+    flex-direction:column;
+    gap:13px;
+}
+.admin-bar-row{
+    display:grid;
+    grid-template-columns:minmax(95px,145px) 1fr minmax(68px,auto);
+    gap:10px;
+    align-items:center;
+}
+.admin-bar-label{
+    min-width:0;
+}
+.admin-bar-flight{
+    display:block;
+    font-size:11.5px;
+    color:var(--navy);
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.admin-bar-route{
+    display:block;
+    margin-top:2px;
+    font-size:9.5px;
+    color:var(--muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.admin-bar-track{
+    position:relative;
+    height:12px;
+    background:#edf1f6;
+    border-radius:999px;
+    overflow:hidden;
+}
+.admin-bar-fill{
+    height:100%;
+    width:0;
+    border-radius:inherit;
+    background:linear-gradient(90deg,var(--navy),#405d89);
+    transition:width .45s ease;
+}
+.admin-bar-fill.revenue{
+    background:linear-gradient(90deg,var(--coral),#ff8a69);
+}
+.admin-bar-value{
+    text-align:right;
+    color:#31415b;
+    font-size:11px;
+    font-weight:800;
+    white-space:nowrap;
+}
+.admin-chart-empty{
+    padding:28px 12px;
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    background:#f8fafc;
+    border-radius:12px;
+}
+@media(max-width:900px){
+    .admin-analytics{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+    .admin-bar-row{grid-template-columns:92px 1fr 58px;gap:7px}
+    .admin-chart-card{padding:15px}
+    .admin-chart-badge{display:none}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+<header>
+    <div class="logo"><span class="logo-mark">✈️</span> SkyBook</div>
+    <nav>
+        <a href="#" onclick="showPage('flights');return false" id="navFlights">Flights</a>
+        <a href="#" onclick="openCustomerPortal();return false" id="navCustomer">My Account</a>
+        <a href="#" onclick="openAdmin();return false" id="navAdmin">Admin</a>
+    </nav>
+    <div class="nav-cta">
+        <a href="#" class="btn btn-ghost btn-sm" id="navLogin" onclick="showPage('login');return false">Log in</a>
+        <a href="#" class="btn btn-primary btn-sm" id="navRegister" onclick="showPage('register');return false">Sign up</a>
+        <a href="#" class="btn btn-ghost btn-sm hidden" id="navLogout" onclick="logoutUser();return false">Log out</a>
+    </div>
+</header>
+
+<!-- ============================================================
+     FLIGHTS PAGE
+============================================================ -->
+<div id="flights" class="page active">
+
+<section class="hero" id="heroSection">
+
+    <svg class="hero-path" viewBox="0 0 1200 300" preserveAspectRatio="none">
+        <path d="M -50 250 Q 300 50 650 150 T 1250 40" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="2" stroke-dasharray="2 14" stroke-linecap="round"/>
+    </svg>
+
+    <div class="hero-copy">
+        <div class="eyebrow">Compare · Book · Fly</div>
+        <h1>Find flights that fit your plans, not the other way around.</h1>
+        <p>Live fares from our flight database, transparent pricing, and a booking flow built to get you a confirmed seat in minutes.</p>
+    </div>
+
+    <div class="search-shell">
+
+        <div class="trip-tabs">
+            <button type="button" class="trip-tab is-active" id="tabOneway" onclick="setTripType('oneway')"><span class="dot"></span> One way</button>
+            <button type="button" class="trip-tab" id="tabRound" onclick="setTripType('round')"><span class="dot"></span> Round trip</button>
+            <button type="button" class="trip-tab" id="tabMulti" onclick="setTripType('multi')"><span class="dot"></span> Multi-city</button>
+        </div>
+
+        <div class="search-card">
+
+            <div class="search-grid" id="mainSearchGrid">
+                <div class="search-field">
+                    <label>From</label>
+                    <input id="origin" placeholder="City or airport code" autocomplete="off" oninput="showCitySuggestions('origin','originSmartList')" onfocus="showCitySuggestions('origin','originSmartList')">
+                    <div id="originSmartList" class="smart-city-list"></div>
+                    <small id="originHint">Type or choose a city</small>
+                </div>
+
+                <div class="swap-wrap"><button type="button" class="swap-btn" onclick="swapCities()" title="Swap cities">⇄</button></div>
+
+                <div class="search-field">
+                    <label>To</label>
+                    <input id="destination" placeholder="City or airport code" autocomplete="off" oninput="showCitySuggestions('destination','destinationSmartList')" onfocus="showCitySuggestions('destination','destinationSmartList')">
+                    <div id="destinationSmartList" class="smart-city-list"></div>
+                    <small id="destinationHint">Type or choose a city</small>
+                </div>
+                <datalist id="cityList"></datalist>
+
+                <div class="search-field">
+                    <label>Departure</label>
+                    <input id="date" type="date">
+                </div>
+
+                <div class="search-field" id="returnFieldWrap">
+                    <label>Return</label>
+                    <input id="returnDate" type="date">
+                </div>
+
+                <div class="search-submit">
+                    <button type="button" onclick="searchFlights()">Search flights</button>
+                </div>
+            </div>
+
+            <div class="multicity-panel" id="multicityPanel">
+                <div id="multiRows"></div>
+                <button type="button" class="add-leg" onclick="addMultiLeg()">+ Add another flight</button>
+            </div>
+
+            <div class="perk-row">
+                <div class="search-field" style="border:1px solid var(--border);border-radius:999px;padding:8px 16px;display:flex;align-items:center;gap:8px;">
+                    <label style="margin:0;font-size:11.5px;">Travellers</label>
+                    <select id="travellers" style="font-size:13.5px;font-weight:700;">
+                        <option>1 Traveller</option>
+                        <option>2 Travellers</option>
+                        <option>3 Travellers</option>
+                        <option>4 Travellers</option>
+                        <option>5 Travellers</option>
+                    </select>
+                </div>
+                <button type="button" class="perk-chip" id="chipFlex" onclick="this.classList.toggle('is-active')">🛡 Flexible dates</button>
+                <button type="button" class="perk-chip" id="chipDirect" onclick="this.classList.toggle('is-active')">⚡ Direct flights only</button>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<div class="trust-strip">
+    <div class="trust-item"><span class="ti-icon">🔒</span><div><h4>Secure checkout</h4><p>Your payment details never touch our servers unencrypted.</p></div></div>
+    <div class="trust-item"><span class="ti-icon">💺</span><div><h4>Real seat inventory</h4><p>Availability is read live from the flights database, not cached.</p></div></div>
+    <div class="trust-item"><span class="ti-icon">↩️</span><div><h4>Flexible fares</h4><p>Add zero-cancellation or free date change at checkout.</p></div></div>
+    <div class="trust-item"><span class="ti-icon">🎧</span><div><h4>Support on call</h4><p>Reach us any time if a booking needs changing.</p></div></div>
+</div>
+
+<p class="status-line" id="message"></p>
+
+<div class="results-heading hidden" id="resultsHeading">
+    <h2 id="resultsTitle">Flights</h2>
+    <p id="resultsSubtitle"></p>
+</div>
+
+<section class="results-layout hidden" id="resultsLayout">
+
+    <aside class="filters-card">
+        <div class="filters-head">
+            <div class="filters-icon">⚙</div>
+            <div>
+                <h3>Filter flights</h3>
+                <p>Fine-tune your results</p>
+            </div>
+        </div>
+
+        <div class="filter-block">
+            <h4>Preferences</h4>
+
+            <label class="filter-option">
+                <span class="filter-copy">
+                    <span class="filter-option-title">On-time flights</span>
+                    <span class="filter-option-sub">Scheduled flights only</span>
+                </span>
+                <input type="checkbox" id="filterOnTime" onchange="applyFilters()">
+                <span class="filter-toggle"></span>
+            </label>
+
+            <label class="filter-option">
+                <span class="filter-copy">
+                    <span class="filter-option-title">Morning departures</span>
+                    <span class="filter-option-sub">Depart before 12 PM</span>
+                </span>
+                <input type="checkbox" id="filterMorning" onchange="applyFilters()">
+                <span class="filter-toggle"></span>
+            </label>
+        </div>
+
+        <div class="filter-block filter-price">
+            <div class="filter-block-title-row">
+                <h4>Maximum price</h4>
+                <span id="filterMaxPriceLabel" class="price-chip">₹20,000</span>
+            </div>
+
+            <input type="range" id="filterMaxPrice" min="0" max="20000" step="500" value="20000" oninput="applyFilters()">
+
+            <div class="fp-values">
+                <span>₹0</span>
+                <span id="filterPriceCeiling">₹20k+</span>
+            </div>
+        </div>
+
+        <div class="filter-block">
+            <h4>Sort results</h4>
+
+            <div class="filter-select-wrap">
+                <select class="filter-select" id="sortBy" onchange="applyFilters()">
+                    <option value="price-asc">Price · Low to high</option>
+                    <option value="price-desc">Price · High to low</option>
+                    <option value="departure-asc">Departure · Earliest first</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="button" class="filters-reset-new" onclick="clearFilters()">
+            ↺ Reset all filters
+        </button>
+    </aside>
+
+    <div class="results-main">
+        <div class="results-count" id="resultsCount"></div>
+        <div class="flight-list" id="flightResults"></div>
+
+        <div class="sticky-bar" id="stickyBar">
+            <div>
+                <div class="sb-route" id="sbRoute"></div>
+                <div class="sb-meta" id="sbMeta"></div>
+            </div>
+            <div class="sb-price" id="sbPrice"></div>
+            <button type="button" class="btn btn-primary" onclick="bookFlight(window.stickyEncodedFlight)">Book this flight</button>
+        </div>
+    </div>
+
+</section>
+
+</div>
+
+<!-- ============================================================
+     BOOKING MODAL
+============================================================ -->
+<div id="bookingModal" class="modal">
+<div class="modal-box">
+<span class="modal-close" onclick="closeBooking()">×</span>
+
+<!-- STEP 1: TRAVELLER DETAILS -->
+<div id="confirmationSection">
+<div class="booking-grid">
+
+    <div class="booking-main">
+        <h2>Traveller details</h2>
+        <p class="step-note">Enter details exactly as they appear on the traveller's government ID.</p>
+
+        <div class="trip-card">
+            <div class="tc-route" id="confirmRoute"></div>
+            <div class="tc-meta">Flight <span id="confirmFlight"></span> · <span id="confirmDateLabel"></span> · Economy</div>
+            <div class="tc-times">
+                <div><div class="tc-time" id="confirmDeparture"></div><div class="tc-place">Departure</div></div>
+                <div class="tc-mid">✈<br>Non-stop</div>
+                <div style="text-align:right"><div class="tc-time" id="confirmArrival"></div><div class="tc-place">Arrival</div></div>
+            </div>
+            <div class="tc-baggage">
+                <span>🧳 Cabin: 7 kg / adult</span>
+                <span>🧳 Check-in: 15 kg / adult</span>
+                <span>↩️ Cancellation fee applies</span>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="fs-label">Adult passenger · 12 yrs+</div>
+
+            <div class="form-row cols-3">
+                <div class="form-group">
+                    <label>Title</label>
+                    <select id="passengerTitle"><option>Mr</option><option>Ms</option><option>Mrs</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Full name</label>
+                    <input id="passengerName" type="text" placeholder="As per government ID">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="passengerGender"><option>Male</option><option>Female</option><option>Other</option></select>
+                </div>
+            </div>
+
+            <div class="form-row cols-2">
+                <div class="form-group">
+                    <label>Date of birth</label>
+                    <input id="passengerDOB" type="date">
+                </div>
+                <div class="form-group">
+                    <label>Nationality</label>
+                    <input id="passengerNationality" type="text" placeholder="e.g. Indian" value="Indian">
+                </div>
+            </div>
+
+            <div class="form-row cols-2">
+                <div class="form-group">
+                    <label>Passport number <span style="font-weight:400;color:var(--muted)">(international only)</span></label>
+                    <input id="passengerPassport" type="text" placeholder="Optional for domestic flights">
+                </div>
+                <div class="form-group">
+                    <label>Frequent flyer number</label>
+                    <input id="frequentFlyer" type="text" placeholder="Optional">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="fs-label">Contact &amp; preferences</div>
+
+            <div class="form-row cols-2">
+                <div class="form-group">
+                    <label>Email — for e-ticket &amp; updates</label>
+                    <input id="passengerEmail" type="email" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone number</label>
+                    <input id="passengerPhone" type="text" placeholder="10-digit mobile number">
+                </div>
+            </div>
+
+            <input id="seatNumber" type="hidden">
+
+            <div class="form-group">
+                <label>Meal preference</label>
+                <select id="mealPref"><option>No preference</option><option>Vegetarian</option><option>Non-vegetarian</option><option>Vegan</option><option>Jain</option></select>
+            </div>
+
+            <div class="form-group">
+                <label>GST number <span style="font-weight:400;color:var(--muted)">(optional, for a business tax invoice)</span></label>
+                <input id="gstNumber" type="text" placeholder="15-digit GSTIN">
+            </div>
+        </div>
+
+        <label class="check-row">
+            <input type="checkbox" id="acceptTerms">
+            I confirm the traveller details above are accurate and I accept the fare rules and cancellation policy.
+        </label>
+
+        <button style="margin-top:18px" class="btn btn-primary btn-block" onclick="continueToPayment()">Continue to payment</button>
+        <p id="bookingMessage" style="text-align:center;margin-top:12px;font-weight:600;font-size:13.5px;color:var(--danger)"></p>
+    </div>
+
+    <div class="booking-side">
+
+        <div class="fare-card">
+            <h3>Fare summary</h3>
+            <div class="fare-row"><span>Base fare</span><span>₹<span id="fareBase"></span></span></div>
+            <div class="fare-row"><span>Taxes &amp; surcharges</span><span>₹<span id="fareTaxes"></span></span></div>
+            <div class="fare-row muted hidden" id="fareInsuranceRow"><span>Travel assurance</span><span>+₹199</span></div>
+            <div class="fare-row total"><span>Total amount</span><span>₹<span id="confirmPrice"></span></span></div>
+        </div>
+
+        <div class="addon-card">
+            <div class="ac-title">Unsure of your plans?</div>
+            <div class="ac-desc">Add flexibility to this booking.</div>
+            <div class="addon-row">
+                <label class="ar-label"><input type="checkbox" id="addonZeroCancel" onchange="updateFareSummary()"> Zero cancellation</label>
+                <span class="ar-price">Free refund</span>
+            </div>
+            <div class="addon-row">
+                <label class="ar-label"><input type="checkbox" id="addonInsurance" onchange="updateFareSummary()"> Travel assurance</label>
+                <span class="ar-price">+₹199</span>
+            </div>
+        </div>
+
+        <div class="addon-card right-seat-card">
+            <div class="right-seat-title-row">
+                <div>
+                    <div class="ac-title">Choose your seat</div>
+                    <div class="ac-desc">Live aircraft layout</div>
+                </div>
+                <div class="chosen-seat-pill">Seat <strong id="selectedSeatLabel">None</strong></div>
+            </div>
+
+            <div class="seat-legend">
+                <span><i class="seat-demo seat-demo-available"></i> Available</span>
+                <span><i class="seat-demo seat-demo-selected"></i> Selected</span>
+                <span><i class="seat-demo seat-demo-booked"></i> Booked</span>
+            </div>
+
+            <div class="aircraft-shell">
+                <div class="aircraft-nose">✈ FRONT</div>
+                <div class="seat-column-labels">
+                    <span>A</span><span>B</span><span>C</span><span class="aisle-label"></span><span>D</span><span>E</span><span>F</span>
+                </div>
+                <div id="seatLayout" class="seat-layout">
+                    <div class="seat-loading">Loading live seat layout…</div>
+                </div>
+                <div class="aircraft-tail">REAR</div>
+            </div>
+
+            <div id="seatLoadingText" class="seat-live-status"></div>
+            <div class="seat-help">Grey seats are already booked. Click an available numbered seat.</div>
+        </div>
+
+        <div class="addon-card">
+            <div class="ac-title">Why book with SkyBook</div>
+            <div class="trust-mini">🔒 Encrypted checkout</div>
+            <div class="trust-mini">💺 Live seat inventory</div>
+            <div class="trust-mini">🎧 Support if plans change</div>
+        </div>
+
+    </div>
+
+</div>
+</div>
+
+<!-- STEP 2: PAYMENT -->
+<div id="paymentSection" class="narrow-section hidden">
+    <h2>Payment</h2>
+
+    <div class="pay-amount">
+        <div class="pa-label">Amount payable</div>
+        <div class="pa-value">₹<span id="paymentAmount"></span></div>
+    </div>
+
+    <div class="pay-methods">
+        <label><input type="radio" name="paymentMethod" value="card" checked onchange="togglePaymentFields()"><span>💳 Card</span></label>
+        <label><input type="radio" name="paymentMethod" value="upi" onchange="togglePaymentFields()"><span>📱 UPI</span></label>
+    </div>
+
+    <div id="cardFields" class="pay-fields">
+        <div class="form-group" style="margin-bottom:12px">
+            <label>Card number</label>
+            <input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" maxlength="19">
+        </div>
+        <div class="form-row cols-2">
+            <div class="form-group"><label>Expiry</label><input id="cardExpiry" type="text" placeholder="MM/YY" maxlength="5"></div>
+            <div class="form-group"><label>CVV</label><input id="cvv" type="text" placeholder="123" maxlength="3"></div>
+        </div>
+    </div>
+
+    <div id="upiFields" class="pay-fields hidden">
+        <div class="form-group" style="margin-bottom:10px">
+            <label>UPI ID</label>
+            <input id="upiId" type="text" placeholder="yourname@upi">
+        </div>
+        <div class="scanner-box">
+            <canvas id="qrCanvas" width="180" height="180"></canvas>
+            <small style="color:var(--muted)">Demo scanner — no real payment is processed.</small>
+        </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="makePayment()">Pay ₹<span id="paymentAmount2"></span></button>
+    <p id="paymentMessage" style="text-align:center;margin-top:12px;font-weight:600;font-size:13.5px;color:var(--danger)"></p>
+</div>
+
+<!-- STEP 3: SUCCESS -->
+<div id="successSection" class="narrow-section hidden">
+    <div class="success-icon">✓</div>
+    <h2>Booking confirmed</h2>
+    <p style="text-align:center;color:var(--muted);font-size:13.5px;margin-top:-8px">Your e-ticket has been generated. A copy has been sent to the email on file.</p>
+
+    <div class="ticket-ref">
+        <div style="font-size:11.5px;color:var(--muted);letter-spacing:.3px;">BOOKING REFERENCE</div>
+        <div class="tr-code" id="bookingId"></div>
+    </div>
+
+    <div class="ticket">
+        <div class="ticket-row"><span>Route</span><span id="ticketRoute"></span></div>
+        <div class="ticket-row"><span>Flight</span><span id="ticketFlight"></span></div>
+        <div class="ticket-row"><span>Passenger</span><span id="ticketPassenger"></span></div>
+        <div class="ticket-row"><span>Seat</span><span id="ticketSeat"></span></div>
+        <div class="ticket-row"><span>Amount paid</span><span id="ticketAmount"></span></div>
+    </div>
+
+    <button class="btn btn-outline btn-block" style="margin-bottom:10px" onclick="window.print()">Print / save e-ticket</button>
+    <button class="btn btn-outline btn-block" style="margin-bottom:10px" onclick="closeBooking();openCustomerPortal()">View my bookings</button>
+    <button class="btn btn-primary btn-block" onclick="closeBooking()">Book another flight</button>
+</div>
+
+</div>
+</div>
+
+<!-- ============================================================
+     LOGIN PAGE
+============================================================ -->
+<div id="login" class="page">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <h2>Welcome back</h2>
+            <p class="sub">Log in to book flights and manage your trips.</p>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input id="loginEmail" type="email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input id="loginPassword" type="password" placeholder="Your password">
+            </div>
+
+            <button class="btn btn-primary btn-block" onclick="loginUser()">Log in</button>
+            <p class="auth-message" id="loginMessage"></p>
+            <p class="auth-switch">New to SkyBook? <a href="#" onclick="showPage('register');return false">Create an account</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     REGISTER PAGE
+============================================================ -->
+<div id="register" class="page">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <h2>Create your account</h2>
+            <p class="sub">Enter your details to create your SkyBook account.</p>
+
+            <div class="form-group">
+                <label>Full name</label>
+                <input id="registerName" type="text" placeholder="Your name">
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input id="registerEmail" type="email" placeholder="you@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input id="registerPassword" type="password" placeholder="At least 6 characters">
+            </div>
+
+            <button class="btn btn-primary btn-block" id="registerButton" onclick="registerUser()">
+                Create account
+            </button>
+
+            <p class="auth-message" id="registerMessage"></p>
+
+            <p class="auth-switch">
+                Already have an account?
+                <a href="#" onclick="showPage('login');return false">Log in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     CUSTOMER PORTAL
+============================================================ -->
+<div id="customer" class="page">
+    <div class="customer-wrap">
+
+        <div class="customer-hero-card">
+            <div>
+                <div class="customer-eyebrow">CUSTOMER PORTAL</div>
+                <h2 id="customerWelcome">Welcome to SkyBook</h2>
+                <p id="customerEmail">Manage your profile and all of your flight bookings in one place.</p>
+            </div>
+
+            <div class="customer-actions">
+                <button class="btn btn-outline btn-sm" onclick="loadCustomerPortal()">↻ Refresh</button>
+                <button class="btn btn-primary btn-sm" onclick="showPage('flights')">Book a flight</button>
+            </div>
+        </div>
+
+        <div class="customer-stats">
+            <div class="customer-stat-card">
+                <div class="customer-stat-icon">🎫</div>
+                <div>
+                    <div class="customer-stat-value" id="customerTotalBookings">0</div>
+                    <div class="customer-stat-label">Total bookings</div>
+                </div>
+            </div>
+
+            <div class="customer-stat-card">
+                <div class="customer-stat-icon">✈️</div>
+                <div>
+                    <div class="customer-stat-value" id="customerUpcomingBookings">0</div>
+                    <div class="customer-stat-label">Upcoming trips</div>
+                </div>
+            </div>
+
+            <div class="customer-stat-card">
+                <div class="customer-stat-icon">₹</div>
+                <div>
+                    <div class="customer-stat-value" id="customerTotalSpent">₹0</div>
+                    <div class="customer-stat-label">Total booking value</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="customer-section">
+            <div class="customer-section-head">
+                <div>
+                    <h3>My bookings</h3>
+                    <p id="customerPortalMessage">Your SkyBook reservations will appear here.</p>
+                </div>
+            </div>
+
+            <div class="customer-table-wrap">
+                <table class="customer-table">
+                    <thead>
+                        <tr>
+                            <th>Booking reference</th>
+                            <th>Flight</th>
+                            <th>Route</th>
+                            <th>Departure</th>
+                            <th>Passenger</th>
+                            <th>Seat</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerBookingRows">
+                        <tr>
+                            <td colspan="8" class="customer-empty">Log in to view your bookings.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="customer-profile-card">
+            <div>
+                <div class="customer-profile-label">ACCOUNT</div>
+                <div class="customer-profile-name" id="customerProfileName">—</div>
+                <div class="customer-profile-email" id="customerProfileEmail">—</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="logoutUser()">Log out</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================
+     ADMIN LOGIN
+============================================================ -->
+<div id="adminLogin" class="page">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <h2>Admin Login</h2>
+            <p class="sub">Sign in to view all SkyBook ticket reservations.</p>
+
+            <div class="form-group">
+                <label>Admin email</label>
+                <input id="adminEmail" type="email" placeholder="admin@skybook.com">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input id="adminPassword" type="password" placeholder="Enter admin password">
+            </div>
+
+            <button class="btn btn-primary btn-block" onclick="adminLogin()">Login as Admin</button>
+            <p class="auth-message" id="adminLoginMessage"></p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     ADMIN BOOKED-TICKETS DASHBOARD
+============================================================ -->
+<div id="admin" class="page">
+    <div class="admin-wrap">
+        <div class="admin-head">
+            <div>
+                <h2>Admin Dashboard</h2>
+                <p class="admin-message" id="adminMessage">All SkyBook ticket reservations</p>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-outline btn-sm" onclick="loadAdminBookings()">↻ Refresh</button>
+                <button class="btn btn-outline btn-sm" onclick="adminLogout()">Admin Logout</button>
+            </div>
+        </div>
+
+        <div class="admin-stats">
+            <div class="stat-card">
+                <div class="sc-value" id="adminTotalBookings">0</div>
+                <div class="sc-label">Total bookings</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="sc-value" id="adminConfirmedBookings">0</div>
+                <div class="sc-label">Confirmed tickets</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="sc-value" id="adminRevenue">₹0</div>
+                <div class="sc-label">Total booking value</div>
+            </div>
+        </div>
+
+        <div class="admin-analytics">
+            <div class="admin-chart-card">
+                <div class="admin-chart-head">
+                    <div>
+                        <h3>Bookings by flight</h3>
+                        <p>Confirmed ticket count for each flight</p>
+                    </div>
+                    <div class="admin-chart-badge" id="adminTopFlight">—</div>
+                </div>
+                <div id="adminBookingChart" class="admin-bar-chart">
+                    <div class="admin-chart-empty">No booking data yet.</div>
+                </div>
+            </div>
+
+            <div class="admin-chart-card">
+                <div class="admin-chart-head">
+                    <div>
+                        <h3>Revenue by flight</h3>
+                        <p>Confirmed booking value generated per flight</p>
+                    </div>
+                    <div class="admin-chart-badge" id="adminTopRevenueFlight">—</div>
+                </div>
+                <div id="adminRevenueChart" class="admin-bar-chart">
+                    <div class="admin-chart-empty">No revenue data yet.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-table-wrap" style="overflow-x:auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Passenger</th>
+                        <th>Contact</th>
+                        <th>Flight</th>
+                        <th>Route</th>
+                        <th>Seat</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Booked on</th>
+                    </tr>
+                </thead>
+
+                <tbody id="adminBookingRows">
+                    <tr>
+                        <td colspan="9" style="text-align:center">Login as admin to view bookings.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+    <div class="footer-grid">
+        <div class="f-brand"><span class="logo-mark" style="width:26px;height:26px;font-size:13px">✈️</span> SkyBook</div>
+        <div class="footer-links">
+            <a href="#" onclick="return false">About</a>
+            <a href="#" onclick="return false">Support</a>
+            <a href="#" onclick="return false">Fare rules</a>
+            <a href="#" onclick="return false">Privacy</a>
+        </div>
+    </div>
+    <div class="footer-copy">Demo flight booking interface, connected to a live MySQL-backed API. No real payments are processed.</div>
+</footer>
+
+<script>
+/* ============================================================
+   CONFIG
+============================================================ */
+const API_URL = "http://localhost:5000";
+
+const CITY_SUGGESTIONS = ["Agartala","Agra","Ahmedabad","Aizawl","Amritsar","Aurangabad","Bagdogra","Bareilly","Belagavi","Bengaluru","Bhopal","Bhubaneswar","Bhuj","Chandigarh","Chennai","Coimbatore","Darbhanga","Dehradun","Delhi","Dharamshala","Dibrugarh","Dimapur","Durgapur","Goa","Gorakhpur","Guwahati","Gwalior","Hubballi","Hyderabad","Imphal","Indore","Jabalpur","Jaipur","Jaisalmer","Jammu","Jodhpur","Jorhat","Kannur","Khajuraho","Kochi","Kolhapur","Kolkata","Kozhikode","Leh","Lucknow","Madurai","Mangaluru","Mumbai","Mysuru","Nagpur","Nashik","Pakyong","Patna","Port Blair","Prayagraj","Pune","Raipur","Rajahmundry","Ranchi","Shillong","Shirdi","Silchar","Srinagar","Surat","Tezpur","Thiruvananthapuram","Thoothukudi","Tiruchirappalli","Tirupati","Udaipur","Vadodara","Varanasi","Vijayawada","Visakhapatnam"];
+document.getElementById('cityList').innerHTML = CITY_SUGGESTIONS.map(c => `<option value="${c}">`).join('');
+
+let selectedTripType = "oneway";
+let multiLegs = [{from:"",to:"",date:""}];
+let selectedFlight = null;
+let lastSearchedFlights = [];
+
+/* ============================================================
+   HELPERS
+============================================================ */
+const getAirport = value => (value && typeof value === "object") ? value : {};
+const cityOf = value => getAirport(value).city || getAirport(value).name || getAirport(value).code || "Unknown";
+const codeOf = value => getAirport(value).code || "";
+const nameOf = value => getAirport(value).name || "";
+const formatMoney = value => Number(value || 0).toLocaleString("en-IN", {minimumFractionDigits:0, maximumFractionDigits:0});
+const formatDate = value => value ? new Date(value).toLocaleDateString("en-IN", {day:"2-digit", month:"short", year:"numeric"}) : "";
+const formatTime = value => value ? new Date(value).toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit", hour12:false}) : "--:--";
+const flightDuration = (a,b) => {
+    if(!a || !b) return "Duration n/a";
+    const mins = Math.max(0, Math.round((new Date(b)-new Date(a))/60000));
+    return `${Math.floor(mins/60)}h ${mins%60}m`;
+};
+function getToken(){ return localStorage.getItem("skybook_token"); }
+function refreshAuthNav(){
+    const loggedIn = !!getToken();
+    document.getElementById("navLogin").classList.toggle("hidden", loggedIn);
+    document.getElementById("navRegister").classList.toggle("hidden", loggedIn);
+    document.getElementById("navLogout").classList.toggle("hidden", !loggedIn);
+}
+
+/* ============================================================
+   PAGE NAVIGATION
+============================================================ */
+function showPage(name){
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(name).classList.add("active");
+    document.querySelectorAll("nav a").forEach(a => a.classList.remove("nav-active"));
+    if(name === "flights") document.getElementById("navFlights").classList.add("nav-active");
+    if(name === "customer" || name === "login" || name === "register"){
+        document.getElementById("navCustomer").classList.add("nav-active");
+    }
+    if(name === "admin" || name === "adminLogin"){
+        document.getElementById("navAdmin").classList.add("nav-active");
+    }
+    window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
+}
+
+/* ============================================================
+   TRIP TYPE / MULTI-CITY / SWAP
+============================================================ */
+function setTripType(type){
+    selectedTripType = type;
+    document.querySelectorAll(".trip-tab").forEach(t => t.classList.remove("is-active"));
+    document.getElementById(type === "oneway" ? "tabOneway" : type === "round" ? "tabRound" : "tabMulti").classList.add("is-active");
+
+    document.getElementById("mainSearchGrid").style.display = type === "multi" ? "none" : "grid";
+    document.getElementById("multicityPanel").classList.toggle("is-open", type === "multi");
+    document.getElementById("returnFieldWrap").style.visibility = type === "round" ? "visible" : "hidden";
+
+    if(type === "multi") renderMultiLegs();
+}
+document.getElementById("returnFieldWrap").style.visibility = "hidden";
+
+function addMultiLeg(){
+    multiLegs.push({from:"",to:"",date:""});
+    renderMultiLegs();
+}
+function removeMultiLeg(i){
+    multiLegs.splice(i,1);
+    renderMultiLegs();
+}
+function renderMultiLegs(){
+    document.getElementById("multiRows").innerHTML = multiLegs.map((leg,i) => `
+        <div class="leg-row">
+            <div class="search-field"><label>From</label><input list="cityList" placeholder="Type city" value="${leg.from}" oninput="multiLegs[${i}].from=this.value"></div>
+            <div class="search-field"><label>To</label><input list="cityList" placeholder="Type city" value="${leg.to}" oninput="multiLegs[${i}].to=this.value"></div>
+            <div class="search-field"><label>Date</label><input type="date" value="${leg.date}" oninput="multiLegs[${i}].date=this.value"></div>
+            ${multiLegs.length > 1 ? `<button type="button" class="remove-leg" onclick="removeMultiLeg(${i})">Remove</button>` : "<span></span>"}
+        </div>`).join("");
+}
+
+function swapCities(){
+    const origin = document.getElementById("origin");
+    const destination = document.getElementById("destination");
+    [origin.value, destination.value] = [destination.value, origin.value];
+}
+
+/* ============================================================
+   SEARCH
+============================================================ */
+async function searchFlights(){
+    const origin = document.getElementById("origin").value.trim();
+    const destination = document.getElementById("destination").value.trim();
+    const date = document.getElementById("date").value;
+    const returnDate = document.getElementById("returnDate").value;
+    const message = document.getElementById("message");
+    const results = document.getElementById("flightResults");
+    const heading = document.getElementById("resultsHeading");
+    const layout = document.getElementById("resultsLayout");
+
+    if(selectedTripType === "multi"){
+        const invalid = multiLegs.some(leg => !leg.from.trim() || !leg.to.trim() || !leg.date);
+        if(invalid){
+            message.innerText = "Please complete every multi-city flight leg.";
+            return;
+        }
+    } else {
+        if(!origin || !destination){
+            message.innerText = "Please enter both a departure and an arrival city.";
+            return;
+        }
+        if(!date){
+            message.innerText = "Please select a departure date.";
+            return;
+        }
+    }
+
+    if(selectedTripType === "round" && !returnDate){
+        message.innerText = "Please select a return date for round-trip search.";
+        return;
+    }
+
+    message.innerText = "Searching live flights…";
+    results.innerHTML = "";
+    heading.classList.add("hidden");
+    layout.classList.add("hidden");
+    hideStickyBar();
+
+    const displayOrigin = selectedTripType === "multi" ? multiLegs[0].from : origin;
+    const displayDestination = selectedTripType === "multi" ? multiLegs[multiLegs.length - 1].to : destination;
+    const displayDate = selectedTripType === "multi" ? multiLegs[0].date : date;
+    enterResultsMode(displayOrigin, displayDestination, displayDate);
+
+    try{
+        const response = await fetch(API_URL + "/api/flights");
+        const result = await response.json();
+        if(!response.ok) throw new Error(result.message || "Unable to load flights");
+
+        const flights = Array.isArray(result.data) ? result.data : [];
+
+        const matchesFlight = (flight, fromQuery, toQuery, travelDate) => {
+            const fromCity = cityOf(flight.origin).toLowerCase();
+            const toCity = cityOf(flight.destination).toLowerCase();
+            const fromCode = codeOf(flight.origin).toLowerCase();
+            const toCode = codeOf(flight.destination).toLowerCase();
+            const fq = String(fromQuery || "").toLowerCase().trim();
+            const tq = String(toQuery || "").toLowerCase().trim();
+            const flightDate = flight.departure_time ? String(flight.departure_time).slice(0,10) : "";
+
+            const fromMatches = fromCity.includes(fq) || fromCode === fq || fromCode.includes(fq);
+            const toMatches = toCity.includes(tq) || toCode === tq || toCode.includes(tq);
+            const dateMatches = !travelDate || flightDate === travelDate;
+
+            return fromMatches && toMatches && dateMatches;
+        };
+
+        let filteredFlights = [];
+        let title = "";
+        let subtitle = "";
+
+        if(selectedTripType === "oneway"){
+            filteredFlights = flights
+                .filter(f => matchesFlight(f, origin, destination, date))
+                .map(f => ({...f, _tripLabel:"One way"}));
+
+            title = `Flights from ${origin} to ${destination}`;
+            subtitle = `Departure: ${formatDate(date)}`;
+
+        } else if(selectedTripType === "round"){
+            const outbound = flights
+                .filter(f => matchesFlight(f, origin, destination, date))
+                .map(f => ({...f, _tripLabel:"Outbound"}));
+
+            const inbound = flights
+                .filter(f => matchesFlight(f, destination, origin, returnDate))
+                .map(f => ({...f, _tripLabel:"Return"}));
+
+            filteredFlights = [...outbound, ...inbound];
+            title = `Round trip: ${origin} ⇄ ${destination}`;
+            subtitle = `Outbound ${formatDate(date)} · Return ${formatDate(returnDate)}`;
+
+        } else {
+            filteredFlights = multiLegs.flatMap((leg, index) =>
+                flights
+                    .filter(f => matchesFlight(f, leg.from, leg.to, leg.date))
+                    .map(f => ({
+                        ...f,
+                        _tripLabel:`Leg ${index + 1}: ${leg.from} → ${leg.to}`
+                    }))
+            );
+
+            title = "Multi-city flight options";
+            subtitle = multiLegs.map((leg, index) =>
+                `Leg ${index + 1}: ${leg.from} → ${leg.to} (${formatDate(leg.date)})`
+            ).join(" · ");
+        }
+
+        lastSearchedFlights = filteredFlights;
+
+        heading.classList.remove("hidden");
+        layout.classList.remove("hidden");
+        document.getElementById("resultsTitle").innerText = title;
+        document.getElementById("resultsSubtitle").innerText = subtitle;
+
+        if(!filteredFlights.length){
+            message.innerText = "No flights matched this route or date.";
+            results.innerHTML = `<div class="empty-card"><h3>No flights available</h3><p>Try another route/date. Suggestions can include cities that do not yet have seeded flights in your database.</p></div>`;
+            document.getElementById("resultsCount").innerText = "";
+            return;
+        }
+
+        message.innerText = `${filteredFlights.length} flight option(s) found.`;
+
+        // Reset all result filters for every new search so a previous
+        // low price range never hides newly found flights.
+        const prices = filteredFlights
+            .map(f => Number(f.price || 0))
+            .filter(Number.isFinite);
+
+        const highestFare = prices.length ? Math.max(...prices) : 0;
+        const priceCeiling = Math.max(
+            20000,
+            Math.ceil(highestFare / 500) * 500
+        );
+
+        const maxPriceInput = document.getElementById("filterMaxPrice");
+        maxPriceInput.min = 0;
+        maxPriceInput.max = priceCeiling;
+        maxPriceInput.value = priceCeiling;
+
+        document.getElementById("filterOnTime").checked = false;
+        document.getElementById("filterMorning").checked = false;
+        document.getElementById("sortBy").value = "price-asc";
+
+        document.getElementById("filterMaxPriceLabel").innerText =
+            "₹" + formatMoney(priceCeiling);
+
+        const ceilingLabel = document.getElementById("filterPriceCeiling");
+        if(ceilingLabel){
+            ceilingLabel.innerText = "₹" + formatMoney(priceCeiling);
+        }
+
+        applyFilters();
+
+    }catch(error){
+        console.error(error);
+        message.innerText = "Could not reach the backend.";
+        heading.classList.remove("hidden");
+        layout.classList.remove("hidden");
+        results.innerHTML = `<div class="empty-card"><h3>⚠️ Backend connection error</h3><p>${error.message}</p><p>Make sure the API server is running on localhost:5000.</p></div>`;
+    }
+}
+
+/* ============================================================
+   RESULTS-PAGE TRANSITION (collapse hero into a slim strip)
+============================================================ */
+function enterResultsMode(origin, destination, date){
+    document.getElementById("heroSection").classList.add("compact");
+    const tripLabels = {oneway:"One way", round:"Round trip", multi:"Multi-city"};
+    window.scrollTo({top: document.getElementById("resultsHeading").offsetTop - 90, behavior:"smooth"});
+}
+
+/* ============================================================
+   FILTER / SORT / RENDER
+============================================================ */
+function applyFilters(){
+    const onTimeOnly = document.getElementById("filterOnTime").checked;
+    const morningOnly = document.getElementById("filterMorning").checked;
+    const maxPrice = Number(document.getElementById("filterMaxPrice").value);
+    const sortBy = document.getElementById("sortBy").value;
+    document.getElementById("filterMaxPriceLabel").innerText = "₹" + formatMoney(maxPrice);
+
+    let list = lastSearchedFlights.filter(flight => {
+        const price = Number(flight.price || 0);
+        const status = String(flight.status || "scheduled").toLowerCase();
+        const departure = flight.departure_time;
+        const hour = departure ? new Date(departure).getHours() : 0;
+        if(price > maxPrice) return false;
+        if(onTimeOnly && !["scheduled","on_time"].includes(status)) return false;
+        if(morningOnly && hour >= 12) return false;
+        return true;
+    });
+
+    list = list.slice().sort((a,b) => {
+        if(sortBy === "price-asc") return Number(a.price||0) - Number(b.price||0);
+        if(sortBy === "price-desc") return Number(b.price||0) - Number(a.price||0);
+        if(sortBy === "departure-asc") return new Date(a.departure_time||0) - new Date(b.departure_time||0);
+        return 0;
+    });
+
+    document.getElementById("resultsCount").innerText = lastSearchedFlights.length
+        ? `${list.length} of ${lastSearchedFlights.length} flight(s) match your filters`
+        : "";
+    renderFlightList(list);
+}
+
+function clearFilters(){
+    document.getElementById("filterOnTime").checked = false;
+    document.getElementById("filterMorning").checked = false;
+    document.getElementById("sortBy").value = "price-asc";
+
+    const maxPriceInput = document.getElementById("filterMaxPrice");
+    maxPriceInput.value = maxPriceInput.max;
+
+    document.getElementById("filterMaxPriceLabel").innerText =
+        "₹" + formatMoney(maxPriceInput.max);
+
+    applyFilters();
+}
+
+function renderFlightList(list){
+    const results = document.getElementById("flightResults");
+    hideStickyBar();
+
+    if(!list.length){
+        results.innerHTML = `<div class="empty-card"><h3>No flights match these filters</h3><p>Try widening the price range or clearing filters.</p></div>`;
+        return;
+    }
+
+    results.innerHTML = list.map((flight, index) => {
+        const flightNumber = flight.flight_number || "Flight";
+        const from = cityOf(flight.origin);
+        const to = cityOf(flight.destination);
+        const fromCode = codeOf(flight.origin);
+        const toCode = codeOf(flight.destination);
+        const departure = flight.departure_time;
+        const arrival = flight.arrival_time;
+        const price = Number(flight.price || 0);
+        const available = Number(flight.available_seats ?? 0);
+        const total = Number(flight.total_seats ?? 0);
+        const status = String(flight.status || "scheduled").toLowerCase();
+        const airline = flightNumber.startsWith("SK") ? "SkyBook Air" : flightNumber.startsWith("AI") ? "AeroIndia" : "Airline";
+        const initials = airline.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+        const safeFlight = {id:flight.id, number:flightNumber, from, to, date:formatDate(departure), departure:formatTime(departure), arrival:formatTime(arrival), price};
+        const encoded = encodeURIComponent(JSON.stringify(safeFlight));
+        const statusClass = status === "delayed" ? "is-delayed" : status === "arrived" ? "is-arrived" : "";
+        const delayText = Number(flight.delay_minutes || 0) > 0 ? `⏱ Delay ${flight.delay_minutes} min` : "On schedule";
+        const tripLabel = flight._tripLabel
+            ? `<span class="trip-result-label">${flight._tripLabel}</span>`
+            : "";
+
+        return `
+            <div class="flight-card" id="card-${index}" onclick="selectFlightCard(${index},'${encoded}')">
+                <div class="fc-main">
+                    <div class="fc-top">
+                        <div class="airline-tag"><span class="airline-mark">${initials}</span><span class="airline-name">${airline} · ${flightNumber}</span></div>
+                        <span class="status-pill ${statusClass}">${status.replace("_"," ")}</span>
+                    </div>
+                    ${tripLabel}<div class="fc-route">${fromCode ? fromCode+" " : ""}${from} → ${toCode ? toCode+" " : ""}${to}</div>
+                    <div class="fc-times">
+                        <div><div class="fc-time">${formatTime(departure)}</div><div class="fc-place">${nameOf(flight.origin) || from}</div></div>
+                        <div class="fc-duration">${flightDuration(departure,arrival)}<div class="line"></div>Non-stop</div>
+                        <div style="text-align:right"><div class="fc-time">${formatTime(arrival)}</div><div class="fc-place">${nameOf(flight.destination) || to}</div></div>
+                    </div>
+                    <div class="fc-meta"><span>📅 ${formatDate(departure)}</span><span>💺 ${available}/${total} seats left</span><span>${delayText}</span></div>
+                </div>
+                <div class="fc-side">
+                    <div class="fc-price">₹${formatMoney(price)}</div>
+                    <div class="fc-price-note">per adult · ${available > 0 ? "seats available" : "sold out"}</div>
+                    <button class="btn ${available > 0 ? "btn-primary" : ""} btn-sm" ${available <= 0 ? "disabled" : ""} onclick="event.stopPropagation();bookFlight('${encoded}')">${available > 0 ? "Book now" : "Sold out"}</button>
+                </div>
+            </div>`;
+    }).join("");
+}
+
+function selectFlightCard(index, encoded){
+    document.querySelectorAll(".flight-card.is-selected").forEach(el => el.classList.remove("is-selected"));
+    const card = document.getElementById("card-" + index);
+    if(!card) return;
+    card.classList.add("is-selected");
+
+    const flight = JSON.parse(decodeURIComponent(encoded));
+    window.stickyEncodedFlight = encoded;
+    document.getElementById("sbRoute").innerText = `${flight.from} → ${flight.to}`;
+    document.getElementById("sbMeta").innerText = `${flight.number} · ${flight.date} · Departs ${flight.departure}`;
+    document.getElementById("sbPrice").innerText = "₹" + formatMoney(flight.price);
+    document.getElementById("stickyBar").classList.add("is-visible");
+}
+function hideStickyBar(){
+    document.getElementById("stickyBar").classList.remove("is-visible");
+}
+
+/* ============================================================
+   BOOKING MODAL — STEP 1: TRAVELLER DETAILS
+============================================================ */
+async function bookFlight(encoded){
+    if(!getToken()){
+        document.getElementById("message").innerText = "Please log in before booking a flight.";
+        showPage("login");
+        return;
+    }
+    selectedFlight = JSON.parse(decodeURIComponent(encoded));
+
+    document.getElementById("confirmFlight").innerText = selectedFlight.number;
+    document.getElementById("confirmRoute").innerText = `${selectedFlight.from} → ${selectedFlight.to}`;
+    document.getElementById("confirmDateLabel").innerText = selectedFlight.date;
+    document.getElementById("confirmDeparture").innerText = selectedFlight.departure;
+    document.getElementById("confirmArrival").innerText = selectedFlight.arrival;
+
+    document.getElementById("addonZeroCancel").checked = false;
+    document.getElementById("addonInsurance").checked = false;
+    document.getElementById("bookingMessage").innerText = "";
+    updateFareSummary();
+
+    document.getElementById("confirmationSection").classList.remove("hidden");
+    document.getElementById("paymentSection").classList.add("hidden");
+    document.getElementById("successSection").classList.add("hidden");
+    document.getElementById("bookingModal").classList.add("is-visible");
+
+    document.getElementById("seatNumber").value = "";
+    document.getElementById("selectedSeatLabel").innerText = "None";
+    await loadSeatLayout(selectedFlight.id);
+}
+
+function updateFareSummary(){
+    if(!selectedFlight) return;
+    const baseFare = Math.round(selectedFlight.price / 1.18);
+    const taxes = selectedFlight.price - baseFare;
+    const insurance = document.getElementById("addonInsurance").checked;
+
+    document.getElementById("fareBase").innerText = formatMoney(baseFare);
+    document.getElementById("fareTaxes").innerText = formatMoney(taxes);
+    document.getElementById("fareInsuranceRow").classList.toggle("hidden", !insurance);
+    document.getElementById("confirmPrice").innerText = formatMoney(selectedFlight.price + (insurance ? 199 : 0));
+}
+
+function closeBooking(){
+    document.getElementById("bookingModal").classList.remove("is-visible");
+}
+
+
+async function loadSeatLayout(flightId){
+    const layout = document.getElementById("seatLayout");
+    const status = document.getElementById("seatLoadingText");
+    if(!layout) return;
+
+    layout.innerHTML = '<div class="seat-loading">Loading live seat layout…</div>';
+    status.innerText = "Loading…";
+
+    try{
+        const response = await fetch(API_URL + "/api/bookings/flights/" + flightId + "/seats");
+        const result = await response.json();
+        if(!response.ok) throw new Error(result.message || "Unable to load seats.");
+
+        renderSeatLayout(result.data);
+        status.innerText = result.data.available_seats + " seats available";
+    }catch(error){
+        console.error(error);
+        layout.innerHTML = '<div class="seat-loading">Could not load seat layout. Please try again.</div>';
+        status.innerText = "";
+    }
+}
+
+function renderSeatLayout(data){
+    const layout = document.getElementById("seatLayout");
+    const booked = new Set((data.booked_seats || []).map(s => String(s).toUpperCase()));
+    const totalSeats = Number(data.total_seats || 180);
+    const seatsPerRow = 6;
+    const rows = Math.ceil(totalSeats / seatsPerRow);
+    const letters = ["A","B","C","D","E","F"];
+
+    let seatCounter = 0;
+    let output = "";
+
+    for(let row = 1; row <= rows; row++){
+        output += '<div class="seat-row"><span class="seat-row-number">' + row + '</span>';
+        for(let i = 0; i < letters.length; i++){
+            if(i === 3) output += '<span class="seat-aisle">│</span>';
+            seatCounter++;
+            if(seatCounter > totalSeats){
+                output += '<span></span>';
+                continue;
+            }
+
+            const seat = row + letters[i];
+            const isBooked = booked.has(seat);
+            output += `<button type="button"
+                class="seat-btn ${isBooked ? "booked" : ""}"
+                data-seat="${seat}"
+                ${isBooked ? "disabled" : ""}
+                onclick="selectSeat('${seat}', this)">${seat}</button>`;
+        }
+        output += '</div>';
+    }
+
+    layout.innerHTML = output;
+}
+
+function selectSeat(seat, button){
+    document.querySelectorAll("#seatLayout .seat-btn.selected").forEach(el => el.classList.remove("selected"));
+    button.classList.add("selected");
+    document.getElementById("seatNumber").value = seat;
+    document.getElementById("selectedSeatLabel").innerText = seat;
+}
+
+/* ============================================================
+   STEP 2: PAYMENT
+============================================================ */
+function continueToPayment(){
+    const name = document.getElementById("passengerName").value.trim();
+    const email = document.getElementById("passengerEmail").value.trim();
+    const phone = document.getElementById("passengerPhone").value.trim();
+    const accepted = document.getElementById("acceptTerms").checked;
+    const message = document.getElementById("bookingMessage");
+
+    if(!name || !email || !phone){
+        message.innerText = "Please fill in the traveller's name, email and phone.";
+        return;
+    }
+    if(!accepted){
+        message.innerText = "Please confirm the traveller details and accept the fare rules.";
+        return;
+    }
+    const selectedSeat = document.getElementById("seatNumber").value.trim();
+    if(!selectedSeat){
+        message.innerText = "Please select an available seat from the aircraft layout.";
+        return;
+    }
+    message.innerText = "";
+
+    const total = selectedFlight.price + (document.getElementById("addonInsurance").checked ? 199 : 0);
+    document.getElementById("paymentAmount").innerText = formatMoney(total);
+    document.getElementById("paymentAmount2").innerText = formatMoney(total);
+
+    document.getElementById("confirmationSection").classList.add("hidden");
+    document.getElementById("paymentSection").classList.remove("hidden");
+    togglePaymentFields();
+}
+
+function togglePaymentFields(){
+    const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+    document.getElementById("cardFields").classList.toggle("hidden", method !== "card");
+    document.getElementById("upiFields").classList.toggle("hidden", method !== "upi");
+    if(method === "upi") generateRandomScanner();
+}
+
+function generateRandomScanner(){
+    const canvas = document.getElementById("qrCanvas");
+    if(!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const size = 180, cells = 21, cell = Math.floor(size/cells);
+    ctx.fillStyle = "#fff"; ctx.fillRect(0,0,size,size);
+    const bits = [];
+    for(let y=0;y<cells;y++){ bits[y]=[]; for(let x=0;x<cells;x++) bits[y][x]=Math.random()>.5; }
+    function finder(x0,y0){
+        for(let y=0;y<7;y++) for(let x=0;x<7;x++){
+            const edge = x===0||x===6||y===0||y===6, center = x>=2&&x<=4&&y>=2&&y<=4;
+            bits[y0+y][x0+x] = edge||center;
+        }
+    }
+    finder(0,0); finder(cells-7,0); finder(0,cells-7);
+    ctx.fillStyle = "#0b1d3a";
+    for(let y=0;y<cells;y++) for(let x=0;x<cells;x++) if(bits[y][x]) ctx.fillRect(x*cell,y*cell,cell,cell);
+}
+
+async function makePayment(){
+    const message = document.getElementById("paymentMessage");
+    const token = getToken();
+
+    if(!token){
+        message.innerText = "Please log in before making a booking.";
+        setTimeout(() => { closeBooking(); showPage("login"); }, 1000);
+        return;
+    }
+
+    const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+    if(method === "card"){
+        const card = document.getElementById("cardNumber").value.trim();
+        const cvv = document.getElementById("cvv").value.trim();
+        if(!card || !cvv){ message.innerText = "Please enter card details."; return; }
+    } else {
+        const upi = document.getElementById("upiId").value.trim();
+        if(!upi){ message.innerText = "Please enter a UPI ID."; return; }
+    }
+
+    message.innerText = "Saving booking to database…";
+
+    try{
+        const passenger = {
+            full_name: document.getElementById("passengerName").value.trim(),
+            email: document.getElementById("passengerEmail").value.trim(),
+            phone: document.getElementById("passengerPhone").value.trim(),
+            passport_number: document.getElementById("passengerPassport").value.trim() || undefined
+        };
+        const seat = document.getElementById("seatNumber").value.trim();
+
+        const response = await fetch(API_URL + "/api/bookings", {
+            method: "POST",
+            headers: {"Content-Type":"application/json", "Authorization":"Bearer " + token},
+            body: JSON.stringify({flight_id: selectedFlight.id, passenger, seat_number: seat || null})
+        });
+
+        const result = await response.json();
+        if(!response.ok) throw new Error(result.message || "Booking failed");
+
+        const booking = result.data;
+        const total = document.getElementById("paymentAmount").innerText;
+
+        document.getElementById("ticketRoute").innerText = `${selectedFlight.from} → ${selectedFlight.to}`;
+        document.getElementById("ticketFlight").innerText = `${selectedFlight.number} · ${selectedFlight.date}`;
+        document.getElementById("ticketPassenger").innerText = passenger.full_name;
+        document.getElementById("ticketSeat").innerText = booking.seat_number || seat || "Not selected";
+        document.getElementById("ticketAmount").innerText = "₹" + total;
+        document.getElementById("bookingId").innerText = booking.booking_reference || booking.id || "Confirmed";
+
+        document.getElementById("paymentSection").classList.add("hidden");
+        document.getElementById("successSection").classList.remove("hidden");
+    }catch(error){
+        console.error(error);
+        message.innerText = error.message;
+    }
+}
+
+/* ============================================================
+   ADMIN
+============================================================ */
+
+function openCustomerPortal(){
+    if(!getToken()){
+        showPage("login");
+        return;
+    }
+
+    showPage("customer");
+    loadCustomerPortal();
+}
+
+async function loadCustomerPortal(){
+    const token = getToken();
+    const message = document.getElementById("customerPortalMessage");
+    const rows = document.getElementById("customerBookingRows");
+
+    if(!token){
+        showPage("login");
+        return;
+    }
+
+    message.innerText = "Loading your bookings…";
+    rows.innerHTML = `
+        <tr>
+            <td colspan="8" class="customer-empty">Loading your trips…</td>
+        </tr>
+    `;
+
+    try{
+        const response = await fetch(API_URL + "/api/bookings/my", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        const result = await response.json();
+
+        if(response.status === 401){
+            localStorage.removeItem("skybook_token");
+            refreshAuthNav();
+            showPage("login");
+            document.getElementById("loginMessage").innerText =
+                "Your login expired. Please log in again.";
+            return;
+        }
+
+        if(!response.ok){
+            throw new Error(result.message || "Unable to load your account.");
+        }
+
+        const user = result.data.user || {};
+        const bookings = Array.isArray(result.data.bookings)
+            ? result.data.bookings
+            : [];
+
+        document.getElementById("customerWelcome").innerText =
+            user.name ? `Welcome, ${user.name}` : "Welcome to SkyBook";
+        document.getElementById("customerEmail").innerText =
+            user.email || "Manage your SkyBook account and bookings.";
+        document.getElementById("customerProfileName").innerText =
+            user.name || "SkyBook customer";
+        document.getElementById("customerProfileEmail").innerText =
+            user.email || "—";
+
+        const now = Date.now();
+        const upcoming = bookings.filter(booking => {
+            const departure = new Date(booking.departure_time).getTime();
+            return booking.status === "confirmed" &&
+                   Number.isFinite(departure) &&
+                   departure >= now;
+        }).length;
+
+        const totalValue = bookings.reduce(
+            (sum, booking) => sum + Number(booking.amount || 0),
+            0
+        );
+
+        document.getElementById("customerTotalBookings").innerText =
+            bookings.length;
+        document.getElementById("customerUpcomingBookings").innerText =
+            upcoming;
+        document.getElementById("customerTotalSpent").innerText =
+            "₹" + formatMoney(totalValue);
+
+        message.innerText = bookings.length
+            ? `${bookings.length} booking${bookings.length === 1 ? "" : "s"} in your account`
+            : "You have no bookings yet.";
+
+        if(!bookings.length){
+            rows.innerHTML = `
+                <tr>
+                    <td colspan="8" class="customer-empty">
+                        No bookings yet. <a href="#" onclick="showPage('flights');return false"
+                        style="color:var(--coral);font-weight:800">Search for a flight</a>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        rows.innerHTML = bookings.map(booking => {
+            const route =
+                `${escapeCustomer(booking.origin_city)} → ${escapeCustomer(booking.destination_city)}`;
+            const routeCode =
+                `${escapeCustomer(booking.origin_code)} → ${escapeCustomer(booking.destination_code)}`;
+            const departure =
+                `${formatDate(booking.departure_time)} · ${formatTime(booking.departure_time)}`;
+
+            return `
+                <tr>
+                    <td>
+                        <span class="customer-booking-ref">${escapeCustomer(booking.booking_reference)}</span>
+                    </td>
+                    <td>
+                        <strong>${escapeCustomer(booking.flight_number)}</strong>
+                    </td>
+                    <td>
+                        <span class="customer-route">${route}</span>
+                        <span class="customer-route-code">${routeCode}</span>
+                    </td>
+                    <td>${escapeCustomer(departure)}</td>
+                    <td>${escapeCustomer(booking.passenger_name)}</td>
+                    <td><strong>${escapeCustomer(booking.seat_number || "—")}</strong></td>
+                    <td>₹${formatMoney(booking.amount)}</td>
+                    <td>
+                        <span class="customer-status">${escapeCustomer(booking.status || "confirmed")}</span>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+    }catch(error){
+        console.error(error);
+        message.innerText = error.message;
+        rows.innerHTML = `
+            <tr>
+                <td colspan="8" class="customer-empty">${escapeCustomer(error.message)}</td>
+            </tr>
+        `;
+    }
+}
+
+function escapeCustomer(value){
+    return String(value ?? "").replace(
+        /[&<>"']/g,
+        character => ({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#39;"
+        }[character])
+    );
+}
+
+function openAdmin(){
+    const adminToken = localStorage.getItem("skybook_admin_token");
+
+    if(adminToken){
+        showPage("admin");
+        loadAdminBookings();
+    }else{
+        showPage("adminLogin");
+    }
+}
+
+async function adminLogin(){
+    const email = document.getElementById("adminEmail").value.trim();
+    const password = document.getElementById("adminPassword").value;
+    const message = document.getElementById("adminLoginMessage");
+
+    if(!email || !password){
+        message.style.color = "var(--danger)";
+        message.innerText = "Enter admin email and password.";
+        return;
+    }
+
+    try{
+        message.style.color = "var(--muted)";
+        message.innerText = "Signing in…";
+
+        const response = await fetch(API_URL + "/api/admin/login", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({email, password})
+        });
+
+        const result = await response.json();
+
+        if(!response.ok){
+            throw new Error(result.message || "Admin login failed");
+        }
+
+        localStorage.setItem("skybook_admin_token", result.data.token);
+
+        message.style.color = "var(--success)";
+        message.innerText = "Admin login successful!";
+
+        setTimeout(() => {
+            showPage("admin");
+            loadAdminBookings();
+        }, 500);
+
+    }catch(error){
+        console.error(error);
+        message.style.color = "var(--danger)";
+        message.innerText = error.message;
+    }
+}
+
+async function loadAdminBookings(){
+    const token = localStorage.getItem("skybook_admin_token");
+
+    if(!token){
+        showPage("adminLogin");
+        return;
+    }
+
+    const rows = document.getElementById("adminBookingRows");
+    const message = document.getElementById("adminMessage");
+
+    rows.innerHTML = `
+        <tr>
+            <td colspan="9" style="text-align:center">Loading bookings…</td>
+        </tr>
+    `;
+
+    try{
+        const response = await fetch(API_URL + "/api/admin/bookings", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        const result = await response.json();
+
+        if(response.status === 401 || response.status === 403){
+            localStorage.removeItem("skybook_admin_token");
+            showPage("adminLogin");
+            throw new Error("Admin session expired. Please login again.");
+        }
+
+        if(!response.ok){
+            throw new Error(result.message || "Unable to load bookings");
+        }
+
+        const bookings = Array.isArray(result.data) ? result.data : [];
+
+        document.getElementById("adminTotalBookings").innerText = bookings.length;
+
+        const confirmed = bookings.filter(booking =>
+            String(booking.status || "").toLowerCase() === "confirmed"
+        ).length;
+
+        document.getElementById("adminConfirmedBookings").innerText = confirmed;
+
+        const revenue = bookings.reduce(
+            (total, booking) => total + Number(booking.amount || 0),
+            0
+        );
+
+        document.getElementById("adminRevenue").innerText = "₹" + formatMoney(revenue);
+
+        renderAdminAnalytics(bookings);
+
+        if(!bookings.length){
+            rows.innerHTML = `
+                <tr>
+                    <td colspan="9" style="text-align:center">No tickets have been booked yet.</td>
+                </tr>
+            `;
+            message.innerText = "No bookings found.";
+            return;
+        }
+
+        rows.innerHTML = bookings.map(booking => {
+            const reference = booking.booking_reference || booking.id || "—";
+            const passenger = booking.passenger_name || "—";
+
+            const contact = `
+                ${escapeAdmin(booking.passenger_email || "")}
+                <br>
+                <small>${escapeAdmin(booking.passenger_phone || "")}</small>
+            `;
+
+            const flight = booking.flight_number || "—";
+            const origin = booking.origin_city || booking.origin || "—";
+            const destination = booking.destination_city || booking.destination || "—";
+            const route = `${origin} → ${destination}`;
+            const seat = booking.seat_number || "Not selected";
+            const amount = "₹" + formatMoney(booking.amount || 0);
+            const status = booking.status || "confirmed";
+
+            const bookedOn = booking.created_at
+                ? new Date(booking.created_at).toLocaleString("en-IN")
+                : "—";
+
+            return `
+                <tr>
+                    <td><strong>${escapeAdmin(reference)}</strong></td>
+                    <td>${escapeAdmin(passenger)}</td>
+                    <td>${contact}</td>
+                    <td>${escapeAdmin(flight)}</td>
+                    <td>${escapeAdmin(route)}</td>
+                    <td>${escapeAdmin(seat)}</td>
+                    <td>${escapeAdmin(amount)}</td>
+                    <td><span class="seat-good">${escapeAdmin(status)}</span></td>
+                    <td>${escapeAdmin(bookedOn)}</td>
+                </tr>
+            `;
+        }).join("");
+
+        message.innerText = bookings.length + " booking(s) loaded from database.";
+
+    }catch(error){
+        console.error(error);
+        message.innerText = error.message;
+
+        rows.innerHTML = `
+            <tr>
+                <td colspan="9" style="text-align:center">${escapeAdmin(error.message)}</td>
+            </tr>
+        `;
+    }
+}
+
+
+function renderAdminAnalytics(bookings){
+    const bookingChart = document.getElementById("adminBookingChart");
+    const revenueChart = document.getElementById("adminRevenueChart");
+    const topFlightBadge = document.getElementById("adminTopFlight");
+    const topRevenueBadge = document.getElementById("adminTopRevenueFlight");
+
+    const confirmed = bookings.filter(booking =>
+        String(booking.status || "").toLowerCase() === "confirmed"
+    );
+
+    const grouped = new Map();
+
+    confirmed.forEach(booking => {
+        const flightNumber = booking.flight_number || "Unknown flight";
+        const origin = booking.origin_code || booking.origin_city || "";
+        const destination = booking.destination_code || booking.destination_city || "";
+        const route = [origin, destination].filter(Boolean).join(" → ");
+        const key = `${flightNumber}|${route}`;
+
+        if(!grouped.has(key)){
+            grouped.set(key, {
+                flightNumber,
+                route,
+                bookings: 0,
+                revenue: 0
+            });
+        }
+
+        const item = grouped.get(key);
+        item.bookings += 1;
+        item.revenue += Number(booking.amount || 0);
+    });
+
+    const flightStats = Array.from(grouped.values());
+
+    if(!flightStats.length){
+        bookingChart.innerHTML =
+            '<div class="admin-chart-empty">No confirmed booking data yet.</div>';
+        revenueChart.innerHTML =
+            '<div class="admin-chart-empty">No confirmed revenue data yet.</div>';
+        topFlightBadge.innerText = "—";
+        topRevenueBadge.innerText = "—";
+        return;
+    }
+
+    const bookingData = [...flightStats]
+        .sort((a,b) => b.bookings - a.bookings || b.revenue - a.revenue);
+
+    const revenueData = [...flightStats]
+        .sort((a,b) => b.revenue - a.revenue || b.bookings - a.bookings);
+
+    const maxBookings = Math.max(...bookingData.map(item => item.bookings), 1);
+    const maxRevenue = Math.max(...revenueData.map(item => item.revenue), 1);
+
+    bookingChart.innerHTML = bookingData.map(item => `
+        <div class="admin-bar-row" title="${escapeAdmin(item.flightNumber)} ${escapeAdmin(item.route)}">
+            <div class="admin-bar-label">
+                <span class="admin-bar-flight">${escapeAdmin(item.flightNumber)}</span>
+                <span class="admin-bar-route">${escapeAdmin(item.route || "Route unavailable")}</span>
+            </div>
+            <div class="admin-bar-track">
+                <div class="admin-bar-fill"
+                     style="width:${Math.max((item.bookings / maxBookings) * 100, 4)}%"></div>
+            </div>
+            <div class="admin-bar-value">${item.bookings}</div>
+        </div>
+    `).join("");
+
+    revenueChart.innerHTML = revenueData.map(item => `
+        <div class="admin-bar-row" title="${escapeAdmin(item.flightNumber)} ${escapeAdmin(item.route)}">
+            <div class="admin-bar-label">
+                <span class="admin-bar-flight">${escapeAdmin(item.flightNumber)}</span>
+                <span class="admin-bar-route">${escapeAdmin(item.route || "Route unavailable")}</span>
+            </div>
+            <div class="admin-bar-track">
+                <div class="admin-bar-fill revenue"
+                     style="width:${Math.max((item.revenue / maxRevenue) * 100, 4)}%"></div>
+            </div>
+            <div class="admin-bar-value">₹${formatMoney(item.revenue)}</div>
+        </div>
+    `).join("");
+
+    const topBookingFlight = bookingData[0];
+    const topRevenueFlight = revenueData[0];
+
+    topFlightBadge.innerText =
+        `${topBookingFlight.flightNumber} · ${topBookingFlight.bookings} booking${topBookingFlight.bookings === 1 ? "" : "s"}`;
+
+    topRevenueBadge.innerText =
+        `${topRevenueFlight.flightNumber} · ₹${formatMoney(topRevenueFlight.revenue)}`;
+}
+
+function adminLogout(){
+    localStorage.removeItem("skybook_admin_token");
+    document.getElementById("adminPassword").value = "";
+
+    const bookingChart = document.getElementById("adminBookingChart");
+    const revenueChart = document.getElementById("adminRevenueChart");
+
+    if(bookingChart){
+        bookingChart.innerHTML =
+            '<div class="admin-chart-empty">Login as admin to view booking analytics.</div>';
+    }
+    if(revenueChart){
+        revenueChart.innerHTML =
+            '<div class="admin-chart-empty">Login as admin to view revenue analytics.</div>';
+    }
+
+    showPage("adminLogin");
+}
+
+function escapeAdmin(value){
+    return String(value ?? "").replace(
+        /[&<>"']/g,
+        character => ({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#39;"
+        }[character])
+    );
+}
+
+/* ============================================================
+   AUTH
+============================================================ */
+async function loginUser(){
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("loginMessage");
+
+    if(!email || !password){ message.innerText = "Enter email and password."; return; }
+
+    try{
+        const response = await fetch(API_URL + "/api/auth/login", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({email, password})
+        });
+        const result = await response.json();
+        if(!response.ok) throw new Error(result.message || "Login failed");
+
+        localStorage.setItem("skybook_token", result.data.token);
+        message.style.color = "var(--success)";
+        message.innerText = "Login successful!";
+        refreshAuthNav();
+        setTimeout(() => openCustomerPortal(), 500);
+    }catch(error){
+        message.style.color = "var(--danger)";
+        message.innerText = error.message;
+    }
+}
+
+async function registerUser(){
+    const name = document.getElementById("registerName").value.trim();
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const message = document.getElementById("registerMessage");
+    const button = document.getElementById("registerButton");
+
+    if(!name || !email || !password){
+        message.style.color = "var(--danger)";
+        message.innerText = "Please enter your name, email and password.";
+        return;
+    }
+
+    if(password.length < 6){
+        message.style.color = "var(--danger)";
+        message.innerText = "Password must be at least 6 characters.";
+        return;
+    }
+
+    try{
+        button.disabled = true;
+        message.style.color = "var(--muted)";
+        message.innerText = "Creating your account…";
+
+        const response = await fetch(API_URL + "/api/auth/register", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({name, email, password})
+        });
+
+        const result = await response.json();
+
+        if(!response.ok){
+            throw new Error(result.message || "Unable to create account.");
+        }
+
+        if(!result.data || !result.data.token){
+            throw new Error("Account created but login token was not returned.");
+        }
+
+        localStorage.setItem("skybook_token", result.data.token);
+        refreshAuthNav();
+
+        message.style.color = "var(--success)";
+        message.innerText = "Account created successfully!";
+
+        document.getElementById("registerName").value = "";
+        document.getElementById("registerEmail").value = "";
+        document.getElementById("registerPassword").value = "";
+
+        setTimeout(() => openCustomerPortal(), 500);
+
+    }catch(error){
+        console.error(error);
+        message.style.color = "var(--danger)";
+        message.innerText = error.message;
+    }finally{
+        button.disabled = false;
+    }
+}
+
+
+function logoutUser(){
+    localStorage.removeItem("skybook_token");
+    refreshAuthNav();
+
+    const rows = document.getElementById("customerBookingRows");
+    if(rows){
+        rows.innerHTML = `
+            <tr>
+                <td colspan="8" class="customer-empty">Log in to view your bookings.</td>
+            </tr>
+        `;
+    }
+
+    showPage("flights");
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+refreshAuthNav();
+renderMultiLegs();
+
+const SMART_AIRPORTS = [
+ {city:"Agartala",code:"IXA",name:"Maharaja Bir Bikram Airport",aliases:[]},
+ {city:"Agra",code:"AGR",name:"Agra Airport",aliases:[]},
+ {city:"Ahmedabad",code:"AMD",name:"Sardar Vallabhbhai Patel International Airport",aliases:[]},
+ {city:"Aizawl",code:"AJL",name:"Lengpui Airport",aliases:[]},
+ {city:"Amritsar",code:"ATQ",name:"Sri Guru Ram Dass Jee International Airport",aliases:[]},
+ {city:"Aurangabad",code:"IXU",name:"Chhatrapati Sambhajinagar Airport",aliases:["Sambhajinagar"]},
+ {city:"Bagdogra",code:"IXB",name:"Bagdogra Airport",aliases:["Siliguri"]},
+ {city:"Bareilly",code:"BEK",name:"Bareilly Airport",aliases:[]},
+ {city:"Belagavi",code:"IXG",name:"Belagavi Airport",aliases:["Belgaum"]},
+ {city:"Bengaluru",code:"BLR",name:"Kempegowda International Airport",aliases:["Bangalore"]},
+ {city:"Bhopal",code:"BHO",name:"Raja Bhoj Airport",aliases:[]},
+ {city:"Bhubaneswar",code:"BBI",name:"Biju Patnaik International Airport",aliases:[]},
+ {city:"Bhuj",code:"BHJ",name:"Bhuj Airport",aliases:[]},
+ {city:"Chandigarh",code:"IXC",name:"Shaheed Bhagat Singh International Airport",aliases:[]},
+ {city:"Chennai",code:"MAA",name:"Chennai International Airport",aliases:["Madras"]},
+ {city:"Coimbatore",code:"CJB",name:"Coimbatore International Airport",aliases:[]},
+ {city:"Darbhanga",code:"DBR",name:"Darbhanga Airport",aliases:[]},
+ {city:"Dehradun",code:"DED",name:"Jolly Grant Airport",aliases:[]},
+ {city:"Delhi",code:"DEL",name:"Indira Gandhi International Airport",aliases:["New Delhi"]},
+ {city:"Dharamshala",code:"DHM",name:"Kangra Airport",aliases:["Dharamsala","Kangra"]},
+ {city:"Dibrugarh",code:"DIB",name:"Dibrugarh Airport",aliases:[]},
+ {city:"Dimapur",code:"DMU",name:"Dimapur Airport",aliases:[]},
+ {city:"Durgapur",code:"RDP",name:"Kazi Nazrul Islam Airport",aliases:["Andal"]},
+ {city:"Goa",code:"GOI",name:"Goa International Airport",aliases:["Dabolim"]},
+ {city:"Goa",code:"GOX",name:"Manohar International Airport",aliases:["Mopa","North Goa"]},
+ {city:"Gorakhpur",code:"GOP",name:"Gorakhpur Airport",aliases:[]},
+ {city:"Guwahati",code:"GAU",name:"Lokpriya Gopinath Bordoloi International Airport",aliases:[]},
+ {city:"Gwalior",code:"GWL",name:"Rajmata Vijaya Raje Scindia Airport",aliases:[]},
+ {city:"Hubballi",code:"HBX",name:"Hubballi Airport",aliases:["Hubli"]},
+ {city:"Hyderabad",code:"HYD",name:"Rajiv Gandhi International Airport",aliases:["Shamshabad"]},
+ {city:"Imphal",code:"IMF",name:"Bir Tikendrajit International Airport",aliases:[]},
+ {city:"Indore",code:"IDR",name:"Devi Ahilya Bai Holkar Airport",aliases:[]},
+ {city:"Jaipur",code:"JAI",name:"Jaipur International Airport",aliases:[]},
+ {city:"Jabalpur",code:"JLR",name:"Jabalpur Airport",aliases:[]},
+ {city:"Jammu",code:"IXJ",name:"Jammu Airport",aliases:[]},
+ {city:"Jodhpur",code:"JDH",name:"Jodhpur Airport",aliases:[]},
+ {city:"Jaisalmer",code:"JSA",name:"Jaisalmer Airport",aliases:[]},
+ {city:"Jorhat",code:"JRH",name:"Jorhat Airport",aliases:[]},
+ {city:"Kannur",code:"CNN",name:"Kannur International Airport",aliases:[]},
+ {city:"Khajuraho",code:"HJR",name:"Khajuraho Airport",aliases:[]},
+ {city:"Kochi",code:"COK",name:"Cochin International Airport",aliases:["Cochin"]},
+ {city:"Kolhapur",code:"KLH",name:"Kolhapur Airport",aliases:[]},
+ {city:"Kolkata",code:"CCU",name:"Netaji Subhas Chandra Bose International Airport",aliases:["Calcutta"]},
+ {city:"Kozhikode",code:"CCJ",name:"Calicut International Airport",aliases:["Calicut"]},
+ {city:"Leh",code:"IXL",name:"Kushok Bakula Rimpochee Airport",aliases:["Ladakh"]},
+ {city:"Lucknow",code:"LKO",name:"Chaudhary Charan Singh International Airport",aliases:[]},
+ {city:"Madurai",code:"IXM",name:"Madurai Airport",aliases:[]},
+ {city:"Mangaluru",code:"IXE",name:"Mangaluru International Airport",aliases:["Mangalore"]},
+ {city:"Mumbai",code:"BOM",name:"Chhatrapati Shivaji Maharaj International Airport",aliases:["Bombay"]},
+ {city:"Mysuru",code:"MYQ",name:"Mysuru Airport",aliases:["Mysore"]},
+ {city:"Nagpur",code:"NAG",name:"Dr. Babasaheb Ambedkar International Airport",aliases:[]},
+ {city:"Nashik",code:"ISK",name:"Nashik Airport",aliases:["Nasik"]},
+ {city:"Patna",code:"PAT",name:"Jay Prakash Narayan Airport",aliases:[]},
+ {city:"Port Blair",code:"IXZ",name:"Veer Savarkar International Airport",aliases:["Sri Vijaya Puram"]},
+ {city:"Prayagraj",code:"IXD",name:"Prayagraj Airport",aliases:["Allahabad"]},
+ {city:"Pune",code:"PNQ",name:"Pune Airport",aliases:[]},
+ {city:"Pakyong",code:"PYG",name:"Pakyong Airport",aliases:["Gangtok"]},
+ {city:"Raipur",code:"RPR",name:"Swami Vivekananda Airport",aliases:[]},
+ {city:"Rajahmundry",code:"RJA",name:"Rajahmundry Airport",aliases:["Rajamahendravaram"]},
+ {city:"Ranchi",code:"IXR",name:"Birsa Munda Airport",aliases:[]},
+ {city:"Shirdi",code:"SAG",name:"Shirdi Airport",aliases:[]},
+ {city:"Shillong",code:"SHL",name:"Shillong Airport",aliases:["Umroi"]},
+ {city:"Silchar",code:"IXS",name:"Silchar Airport",aliases:[]},
+ {city:"Srinagar",code:"SXR",name:"Srinagar International Airport",aliases:[]},
+ {city:"Surat",code:"STV",name:"Surat International Airport",aliases:[]},
+ {city:"Tezpur",code:"TEZ",name:"Tezpur Airport",aliases:[]},
+ {city:"Thiruvananthapuram",code:"TRV",name:"Thiruvananthapuram International Airport",aliases:["Trivandrum"]},
+ {city:"Tiruchirappalli",code:"TRZ",name:"Tiruchirappalli International Airport",aliases:["Trichy"]},
+ {city:"Tirupati",code:"TIR",name:"Tirupati Airport",aliases:[]},
+ {city:"Thoothukudi",code:"TCR",name:"Tuticorin Airport",aliases:["Tuticorin"]},
+ {city:"Udaipur",code:"UDR",name:"Maharana Pratap Airport",aliases:[]},
+ {city:"Vadodara",code:"BDQ",name:"Vadodara Airport",aliases:["Baroda"]},
+ {city:"Varanasi",code:"VNS",name:"Lal Bahadur Shastri International Airport",aliases:["Banaras","Benares"]},
+ {city:"Vijayawada",code:"VGA",name:"Vijayawada International Airport",aliases:[]},
+ {city:"Visakhapatnam",code:"VTZ",name:"Visakhapatnam Airport",aliases:["Vizag"]}
+];
+
+function cityMatchScore(a,q){
+    q = q.toLowerCase().trim();
+    if(!q) return 1;
+
+    const city = a.city.toLowerCase();
+    const code = a.code.toLowerCase();
+    const name = a.name.toLowerCase();
+    const aliases = (a.aliases || []).map(x => x.toLowerCase());
+
+    if(city === q || code === q) return 1000;
+    if(city.startsWith(q)) return 900;
+    if(aliases.some(x => x.startsWith(q))) return 850;
+    if(code.startsWith(q)) return 800;
+
+    const cityWords = city.split(/\s+/);
+    const nameWords = name.split(/\s+/);
+
+    if(cityWords.some(w => w.startsWith(q))) return 760;
+    if(nameWords.some(w => w.startsWith(q))) return 700;
+
+    if(city.includes(q)) return 600;
+    if(aliases.some(x => x.includes(q))) return 550;
+    if(code.includes(q)) return 500;
+    if(name.includes(q)) return 400;
+
+    return 0;
+}
+
+function showCitySuggestions(inputId,listId){
+    const input=document.getElementById(inputId);
+    const list=document.getElementById(listId);
+    const q=input.value.trim();
+    const matches=SMART_AIRPORTS
+        .map(a=>({a,score:cityMatchScore(a,q)}))
+        .filter(x=>x.score>0)
+        .sort((x,y)=>y.score-x.score)
+        .slice(0,10)
+        .map(x=>x.a);
+
+    if(!matches.length){
+        list.innerHTML='<div class="smart-no-city">No matching city or airport</div>';
+    }else{
+        list.innerHTML=matches.map(a=>`
+          <div class="smart-city-option" onmousedown="chooseSmartCity('${inputId}','${listId}','${a.city}','${a.code}')">
+            <div>
+              <div class="smart-city-name">${a.city}</div>
+              <div class="smart-airport-name">${a.name}</div>
+            </div>
+            <div class="smart-airport-code">${a.code}</div>
+          </div>`).join('');
+    }
+    list.style.display='block';
+}
+
+function chooseSmartCity(inputId,listId,city,code){
+    const input=document.getElementById(inputId);
+    input.value=city;
+    input.dataset.airportCode=code;
+    document.getElementById(listId).style.display='none';
+}
+
+document.addEventListener('click',e=>{
+    ['originSmartList','destinationSmartList'].forEach(id=>{
+        const list=document.getElementById(id);
+        if(list && !list.contains(e.target)) list.style.display='none';
+    });
+});
+
+
+let smartCityActiveIndex = -1;
+
+function getVisibleSmartList(){
+    return Array.from(document.querySelectorAll(".smart-city-list"))
+        .find(list => list.style.display === "block");
+}
+
+document.addEventListener("keydown", function(e){
+    const list = getVisibleSmartList();
+    if(!list) return;
+
+    const options = Array.from(list.querySelectorAll(".smart-city-option"));
+    if(!options.length) return;
+
+    if(e.key === "ArrowDown"){
+        e.preventDefault();
+        smartCityActiveIndex = Math.min(smartCityActiveIndex + 1, options.length - 1);
+    } else if(e.key === "ArrowUp"){
+        e.preventDefault();
+        smartCityActiveIndex = Math.max(smartCityActiveIndex - 1, 0);
+    } else if(e.key === "Enter" && smartCityActiveIndex >= 0){
+        e.preventDefault();
+        options[smartCityActiveIndex].dispatchEvent(new MouseEvent("mousedown", {bubbles:true}));
+        smartCityActiveIndex = -1;
+        return;
+    } else if(e.key === "Escape"){
+        list.style.display = "none";
+        smartCityActiveIndex = -1;
+        return;
+    } else {
+        return;
+    }
+
+    options.forEach((opt,i) => opt.classList.toggle("smart-active", i === smartCityActiveIndex));
+    options[smartCityActiveIndex]?.scrollIntoView({block:"nearest"});
+});
+
+</script>
+
+</body>
+</html>
